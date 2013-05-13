@@ -58,10 +58,11 @@ def cotizacion(request):
     usuario = request.user
     empresa = request.session['enterprise']
     print usuario.nombre
-    clientes = list(Cliente.objects.filter(empresa=empresa.id))
+    clientes = Cliente.objects.filter(empresa=empresa.id)
+    clientes.order_by('-id')
     motos = list(Moto.objects.filter(inventario_motos__en_venta=True))
     tasas = T_financiacion.objects.filter(empresa=empresa.id)
-    return render_to_response("cotizador/base.html",{'clientes':clientes,'motos':motos,'tasas':tasas},context_instance= RequestContext(request))
+    return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas},context_instance= RequestContext(request))
 
 
 def logout(request):

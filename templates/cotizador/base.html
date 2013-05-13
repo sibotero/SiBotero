@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-{% load extratags %}
 <html lang="es-co" >
 <head>
 <title>Sistema de Cotización | SiCoBotero</title>
@@ -7,18 +6,13 @@
 <link rel="stylesheet" type="text/css" href="/static/cotizacion/dashboard.css">
 <link rel="stylesheet" type="text/css" href="/static/cotizacion/js/select2/select2.css">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
-
 </head>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script type="text/javascript" src="/static/cotizacion/js/select2/select2.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+{% block scripts %}
 
-<script>
-    $(document).ready(function (){
-        $("#s1").select2();
-        $("#s2").select2();
-    });
-</script>
+{% endblock %}
 <body class="dashboard">
 
 <!-- Container -->
@@ -54,45 +48,10 @@
     <h1>Cotizacion</h1>
 
     <div id="content-main">
-    <div id="cotizacion-datos">
-    <form>
-        <fieldset>
-        <p><label class="field" for ="moto"> Moto : </label>
-        <select name="moto" id="s1">
-            {% for moto in motos %}
-            <option value="{{ moto.id }}">{{ ""|concat:moto.nombre_fabr|concat:" "|concat:moto.referencia|concat:" "|concat:moto.modelo }}</option>
-            {% endfor %}
-        </select>
-        </p>
-        <p><label class="field" for="cliente">Cliente : </label>
-        <select name="cliente" id="s2">
-            {% for cliente in clientes %}
-            <option value="{{ cliente.id }}">{{ cliente.nombre|add:" "|add:cliente.apellidos }}</option>
-            {% endfor %}
-        </select>
-        </p>
-        <p><label class="field">Cuotas</label>
-        <div id="grid_cuotas">
-        {% for tasa in tasas %}
-        <input type="checkbox" value="{{ tasa.id }}" name="{{ tasa.num_meses }}cuotas"/>
-            <label for="1cuotas" >{{ tasa.num_meses }}</label>
-        {% endfor %}
-        </div></p>
-        <p><label class="field" for="cuota_inicial">Cuota Inicial : </label>
-            <input type="text" placeholder="cuota inicial"/></p>
-        <p><label class="aplicar_vip" for="vip_cli">¿Cliente especial?</label>
-            <input type="checkbox"></p>
-        <p>
-            <input type="submit" value="Realizar" />
-        </p>
-        </fieldset>
-    </form>
-    </div>
-    <div id="resultado-cotizacion">
-
-    </div>
+    {% block content-main %}
 
 
+    {% endblock %}
     </div>
     <!-- END Content -->
     {% if user.is_staff %}

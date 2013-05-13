@@ -890,3 +890,11 @@ fieldset input,select{
 #cont-panel img{
     margin-right:20px;
 }
+
+#add_cliente{
+    margin-top:-10px;
+}
+
+#popUp_cli{
+    visibility: hidden;
+}
