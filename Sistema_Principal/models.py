@@ -28,6 +28,10 @@ class UsuarioManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self.db)
+        user.user_permissions = []
+        user.user_permissions.add('Sistema_Principal.add_cotizacion')
+        user.user_permissions.add('Sistema_Principal.add_cliente')
+        user.save()
         return user
     def create_superuser(self, email, username, password):
         """
