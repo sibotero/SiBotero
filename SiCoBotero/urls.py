@@ -5,6 +5,7 @@ from Sistema_Principal.views import *
 from django.views.generic import RedirectView
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -21,7 +22,8 @@ urlpatterns = patterns('',
     url(r'^login/',login,name = "login"),
     url(r'^cotizacion/',cotizacion,name="cotizacion"),
     url(r'^logout/',logout,name="logout"),
-    url(r'^add_cliente',add_cliente,name="add_cliente"),
+    url(r'^add_cliente/',add_cliente,name="add_cliente"),
+    url(r'^thanks/',gracias,name="gracias"),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),
 )
 

@@ -60,8 +60,7 @@ def cotizacion(request):
     usuario = request.user
     empresa = request.session['enterprise']
     print usuario.nombre
-    clientes = Cliente.objects.filter(empresa=empresa.id)
-    clientes.order_by('-id')
+    clientes = Cliente.objects.filter(empresa=empresa.id).order_by('-id')
     motos = list(Moto.objects.filter(inventario_motos__en_venta=True))
     tasas = T_financiacion.objects.filter(empresa=empresa.id)
 
@@ -99,8 +98,10 @@ def add_cliente(request):
             cliente.not_por_email = not_por_email
             cliente.empresa = request.session['enterprise']
             cliente.save()
-            return HttpResponseRedirect("/cotizacion/")
+            return HttpResponseRedirect("/thanks/")
         else:
-            return render(request,"cotizador/form_cliente.html",{'form':form},context_instance=RequestContext(request),status="400")
+            return render(request,"cotizador/form_cliente.html",{'form':form},context_instance=RequestContext(request))
             #return render_to_response("cotizador/form_cliente.html",{'form':form},context_instance=RequestContext(request))
 
+def gracias(request):
+    return render_to_response("cotizador/thanks.html",{},context_instance=RequestContext(request))

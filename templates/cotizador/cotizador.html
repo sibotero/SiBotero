@@ -15,10 +15,7 @@
         });
 
         $("#openPop").click(function(){
-            $.get("{% url 'add_cliente' %}",function(data){
-                $("#pop").html(data)
-            });
-            $("#pop").dialog("open");
+            window.open("/add_cliente/","_blank",'width=500,height=600');
         });
 
 
@@ -33,7 +30,7 @@
         <p><label class="field" for="cliente">Cliente : </label>
         <select name="cliente" id="s2">
             {% for cliente in clientes %}
-            <option value="{{ cliente.id }}">{{ cliente.nombre|add:" "|add:cliente.apellidos }}</option>
+            <option value="{{ cliente.id }}">{{ cliente.nombre|add:" "|add:cliente.apellidos|concat:" "|concat:"cc: "|concat:cliente.cedula }}</option>
             {% endfor %}
         </select>
         <a id="openPop" href="#"><img id="add_cliente" src="/static/cotizacion/img/list-add.png" />Nuevo Cliente</a>
