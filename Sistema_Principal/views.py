@@ -1,12 +1,14 @@
 # -*- encoding: utf-8 -*-
 # Create your views here.
 
-from django.shortcuts import render_to_response, redirect, HttpResponseRedirect
+from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render
 from django.template.context import RequestContext
 from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from Sistema_Principal.forms import AgregarCliente
+from django.http import HttpResponse
 
 
 def login(request):
@@ -62,9 +64,43 @@ def cotizacion(request):
     clientes.order_by('-id')
     motos = list(Moto.objects.filter(inventario_motos__en_venta=True))
     tasas = T_financiacion.objects.filter(empresa=empresa.id)
+
     return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas},context_instance= RequestContext(request))
 
 
 def logout(request):
     auth_logout(request)
     return redirect("/login/")
+
+def add_cliente(request):
+    if request.method == "GET":
+        print "AQUI"
+        form_add = AgregarCliente()
+        print (form_add.as_p())
+        return render_to_response("cotizador/form_cliente.html",{'form':form_add},context_instance=RequestContext(request))
+    elif request.method =="POST":
+        form = AgregarCliente(request.POST)
+        if form.is_valid():
+            print "AQUI!!"
+            cedula = form.cleaned_data['cedula']
+            nombre = form.cleaned_data['nombre']
+            apellidos = form.cleaned_data['apellidos']
+            direccion = form.cleaned_data['direccion']
+            telefono = form.cleaned_data['telefono']
+            email = form.cleaned_data['email']
+            not_por_email = form.cleaned_data['not_por_email']
+            cliente = Cliente()
+            cliente.cedula = cedula
+            cliente.nombre = nombre
+            cliente.apellidos = apellidos
+            cliente.direccion = direccion
+            cliente.telefono = telefono
+            cliente.email = email
+            cliente.not_por_email = not_por_email
+            cliente.empresa = request.session['enterprise']
+            cliente.save()
+            return HttpResponseRedirect("/cotizacion/")
+        else:
+            return render(request,"cotizador/form_cliente.html",{'form':form},context_instance=RequestContext(request),status="400")
+            #return render_to_response("cotizador/form_cliente.html",{'form':form},context_instance=RequestContext(request))
+

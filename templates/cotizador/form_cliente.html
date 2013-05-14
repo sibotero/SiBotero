@@ -1,0 +1,51 @@
+<script>
+    $(function(){
+        $("#formu").validity(function(){
+            $("#id_cedula")
+                    .require({msg:"Introduzca la cedula del cliente"})
+                    .match("number")
+            $("#id_email")
+                    .require()
+                    .match("email")
+            $("#id_nombre")
+                    .require()
+            $("#id_apellidos")
+                    .require()
+            $("#id_direccion")
+                    .require()
+            $("#id_telefono")
+                    .require()
+                    .match("phone")
+        });
+    });
+</script>
+<form id="formu" action="/add_cliente/" method="POST">{% csrf_token %}
+<fieldset>
+<p>
+
+    <label class="field" for="id_cedula">Cedula:</label>{{ form.cedula }}<br /><span class="helptext">Cedula del Cliente</span>
+</p>
+<p>
+
+    <label class="field" for="id_nombre">Nombre:</label>{{ form.nombre }}<br /><span class="helptext">Nombre del Cliente</span>
+</p>
+<p>
+
+    <label class="field" for="id_apellidos">Apellidos:</label>{{ form.apellidos }}<br/><span class="helptext">Apellidos del Cliente</span>
+</p>
+<p>
+
+    <label class="field" for="id_direccion">Direccion:</label>{{ form.direccion }}<br /><span class="helptext">Direccion de Cliente</span>
+</p>
+<p>
+
+    <label class="field" for="id_telefono">Telefono:</label>{{ form.telefono }}<br /><span class="helptext">Telefono del Cliente</span>
+</p>
+<p>
+
+    <label class="field" for="id_email">Email:</label>{{ form.email }}<br /><span class="helptext">Correo del cliente</span>
+</p>
+<p><label class="field" for="id_not_por_email">Not por email:</label>{{ form.not_por_email }}</p>
+<input id="ag_cli" type="submit" value="Agregar">
+</fieldset>
+</form>

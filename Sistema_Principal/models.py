@@ -105,6 +105,7 @@ class Cliente(models.Model):
     direccion = models.CharField(max_length=200,help_text=("Direccion de Cliente"),null=False)
     telefono = models.CharField(max_length=10, help_text=("Telefono del Cliente"),null=False)
     email = models.CharField(max_length=60, help_text=("Correo del cliente"),null=False)
+    not_por_email = models.BooleanField()
     empresa = models.ForeignKey(Empresa)
     def __unicode__(self):
         return self.nombre+" "+self.apellidos+" : "+self.cedula

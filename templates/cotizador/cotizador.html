@@ -6,15 +6,22 @@
         $("#s1").select2();
         $("#s2").select2();
         $("#pop").dialog({autoOpen:false,
+            title:"Agregar Cliente",
+            resizable:false,
+            position: { my: "center", at: "top", of: window },
             close:function(event,ui){
                 location.reload();
-
-            }
+            },width:600
         });
 
         $("#openPop").click(function(){
+            $.get("{% url 'add_cliente' %}",function(data){
+                $("#pop").html(data)
+            });
             $("#pop").dialog("open");
         });
+
+
     });
 </script>
 {% endblock %}
@@ -60,6 +67,6 @@
     </div>
 
     <div id="pop">
-    <p>Aca colocare el form para crear clientes.</p>
+
     </div>
 {% endblock %}
