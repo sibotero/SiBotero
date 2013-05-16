@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django import forms
-from django.utils.html import format_html
+from Sistema_Principal.models import Cotizacion
 
 class AgregarCliente(forms.Form):
     cedula = forms.IntegerField(help_text=("Cedula del Cliente"),required=True,widget=forms.TextInput(attrs={'class':'required'}))
@@ -11,3 +11,7 @@ class AgregarCliente(forms.Form):
     email = forms.EmailField(max_length=60, help_text=("Correo del cliente"),required=True)
     not_por_email = forms.BooleanField(required=False)
 
+class CotizarForm(forms.ModelForm):
+    class Meta:
+        model = Cotizacion
+        exclude=['empresa','fecha_cot','vendedor']

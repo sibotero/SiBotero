@@ -3,12 +3,13 @@
 
 from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render
 from django.template.context import RequestContext
-from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion
+from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from Sistema_Principal.forms import AgregarCliente
-from django.http import HttpResponse
+from Sistema_Principal.forms import CotizarForm
+from datetime import datetime
 
 
 def login(request):
@@ -59,13 +60,53 @@ def cotizacion(request):
         return HttpResponseRedirect("/login/")
     usuario = request.user
     empresa = request.session['enterprise']
-    print usuario.nombre
     clientes = Cliente.objects.filter(empresa=empresa.id).order_by('-id')
     motos = list(Moto.objects.filter(inventario_motos__en_venta=True))
     tasas = T_financiacion.objects.filter(empresa=empresa.id)
+    if request.method == "GET":
+        form = CotizarForm()
+        print form.as_table()
+        return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas,'form':form},context_instance= RequestContext(request))
+    if request.method=="POST":
+        form = CotizarForm(request.POST)
+        if form.is_valid():
+            add = form.save(commit=False)
+            add.fecha_cot = datetime.today()
+            add.empresa = request.session['enterprise']
+            add.vendedor = request.user
+            add.save()
+            form.save_m2m()
+            return HttpResponseRedirect("/reportar/%s/"%(add.id))
 
-    return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas},context_instance= RequestContext(request))
 
+
+def report_cot(request,id_cot):
+    cot = Cotizacion.objects.get(id=id_cot)
+    moto = cot.moto.precio_publico
+    kit = cot.moto.kit_set.all()[0]
+    kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
+    n_cuotas = cot.n_cuotas.all()[0:]
+    m_asociadas = cot.matricula_asociada.all()[0:]
+    c_ini = cot.cuota_inicial
+    sin_mat = moto + kit_total
+    l_con_mat = []
+    for i,mat in enumerate(m_asociadas):
+        print i
+        l_con_mat.append( (sin_mat+mat.precio) - c_ini )
+    print l_con_mat
+    l_preciot_cuotas = []
+
+    for i,el in enumerate(l_con_mat):
+        l_preciot_cuotas.append([])
+        for j,fin in enumerate(n_cuotas):
+            if fin.valor_por != 0:
+                l_preciot_cuotas[i].append(int(el*fin.valor_por))
+            else:
+                l_preciot_cuotas[i].append(int(el/fin.num_meses))
+
+    print l_preciot_cuotas
+    print c_ini
+    return render_to_response("cotizador/reporte.html",{},context_instance=RequestContext(request))
 
 def logout(request):
     auth_logout(request)
@@ -105,3 +146,4 @@ def add_cliente(request):
 
 def gracias(request):
     return render_to_response("cotizador/thanks.html",{},context_instance=RequestContext(request))
+

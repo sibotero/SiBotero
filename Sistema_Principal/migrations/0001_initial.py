@@ -35,7 +35,6 @@ class Migration(SchemaMigration):
             ('apellidos', self.gf('django.db.models.fields.CharField')(max_length=40)),
             ('esta_activo', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('es_admin', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('es_superadmin', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
         db.send_create_signal(u'Sistema_Principal', ['Usuario'])
 
@@ -72,21 +71,10 @@ class Migration(SchemaMigration):
             ('direccion', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('telefono', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('email', self.gf('django.db.models.fields.CharField')(max_length=60)),
+            ('not_por_email', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
         ))
         db.send_create_signal(u'Sistema_Principal', ['Cliente'])
-
-        # Adding model 'Moto'
-        db.create_table(u'Sistema_Principal_moto', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('nombre_fabr', self.gf('django.db.models.fields.CharField')(max_length=15)),
-            ('referencia', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('modelo', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('precio_publico', self.gf('django.db.models.fields.IntegerField')(max_length=14)),
-            ('cuota_minima', self.gf('django.db.models.fields.IntegerField')(max_length=15)),
-            ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
-        ))
-        db.send_create_signal(u'Sistema_Principal', ['Moto'])
 
         # Adding model 'Kit'
         db.create_table(u'Sistema_Principal_kit', (
@@ -95,8 +83,8 @@ class Migration(SchemaMigration):
             ('casco', self.gf('django.db.models.fields.IntegerField')(max_length=10)),
             ('chaleco', self.gf('django.db.models.fields.IntegerField')(max_length=10)),
             ('transporte', self.gf('django.db.models.fields.IntegerField')(max_length=10)),
+            ('placa', self.gf('django.db.models.fields.IntegerField')(max_length=10)),
             ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
-            ('moto_asociada', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Moto'], unique=True)),
         ))
         db.send_create_signal(u'Sistema_Principal', ['Kit'])
 
@@ -106,9 +94,22 @@ class Migration(SchemaMigration):
             ('nombre_ciudad', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('precio', self.gf('django.db.models.fields.IntegerField')(max_length=20)),
             ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
-            ('kit_asociado', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Kit'])),
         ))
         db.send_create_signal(u'Sistema_Principal', ['Matricula'])
+
+        # Adding model 'Moto'
+        db.create_table(u'Sistema_Principal_moto', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('nombre_fabr', self.gf('django.db.models.fields.CharField')(max_length=15)),
+            ('referencia', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
+            ('modelo', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('precio_publico', self.gf('django.db.models.fields.IntegerField')(max_length=14)),
+            ('cuota_minima', self.gf('django.db.models.fields.IntegerField')(max_length=15)),
+            ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
+            ('matricula_asociada', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Matricula'])),
+            ('kit_asociado', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Kit'])),
+        ))
+        db.send_create_signal(u'Sistema_Principal', ['Moto'])
 
         # Adding model 'Inventario_motos'
         db.create_table(u'Sistema_Principal_inventario_motos', (
@@ -122,7 +123,7 @@ class Migration(SchemaMigration):
         # Adding model 'T_financiacion'
         db.create_table(u'Sistema_Principal_t_financiacion', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('num_meses', self.gf('django.db.models.fields.IntegerField')(max_length=2)),
+            ('num_meses', self.gf('django.db.models.fields.IntegerField')(unique=True, max_length=2)),
             ('valor_por', self.gf('django.db.models.fields.FloatField')()),
             ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
         ))
@@ -135,10 +136,18 @@ class Migration(SchemaMigration):
             ('moto', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Moto'])),
             ('vendedor', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Usuario'])),
             ('cliente', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Cliente'])),
-            ('n_cuotas', self.gf('django.db.models.fields.IntegerField')()),
             ('cuota_inicial', self.gf('django.db.models.fields.IntegerField')()),
+            ('empresa', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Sistema_Principal.Empresa'])),
         ))
         db.send_create_signal(u'Sistema_Principal', ['Cotizacion'])
+
+        # Adding M2M table for field n_cuotas on 'Cotizacion'
+        db.create_table(u'Sistema_Principal_cotizacion_n_cuotas', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('cotizacion', models.ForeignKey(orm[u'Sistema_Principal.cotizacion'], null=False)),
+            ('t_financiacion', models.ForeignKey(orm[u'Sistema_Principal.t_financiacion'], null=False))
+        ))
+        db.create_unique(u'Sistema_Principal_cotizacion_n_cuotas', ['cotizacion_id', 't_financiacion_id'])
 
 
     def backwards(self, orm):
@@ -160,14 +169,14 @@ class Migration(SchemaMigration):
         # Deleting model 'Cliente'
         db.delete_table(u'Sistema_Principal_cliente')
 
-        # Deleting model 'Moto'
-        db.delete_table(u'Sistema_Principal_moto')
-
         # Deleting model 'Kit'
         db.delete_table(u'Sistema_Principal_kit')
 
         # Deleting model 'Matricula'
         db.delete_table(u'Sistema_Principal_matricula')
+
+        # Deleting model 'Moto'
+        db.delete_table(u'Sistema_Principal_moto')
 
         # Deleting model 'Inventario_motos'
         db.delete_table(u'Sistema_Principal_inventario_motos')
@@ -177,6 +186,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Cotizacion'
         db.delete_table(u'Sistema_Principal_cotizacion')
+
+        # Removing M2M table for field n_cuotas on 'Cotizacion'
+        db.delete_table('Sistema_Principal_cotizacion_n_cuotas')
 
 
     models = {
@@ -189,16 +201,18 @@ class Migration(SchemaMigration):
             'empresa': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Empresa']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'nombre': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'not_por_email': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'telefono': ('django.db.models.fields.CharField', [], {'max_length': '10'})
         },
         u'Sistema_Principal.cotizacion': {
             'Meta': {'object_name': 'Cotizacion'},
             'cliente': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Cliente']"}),
             'cuota_inicial': ('django.db.models.fields.IntegerField', [], {}),
+            'empresa': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Empresa']"}),
             'fecha_cot': ('django.db.models.fields.DateField', [], {'auto_now': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'moto': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Moto']"}),
-            'n_cuotas': ('django.db.models.fields.IntegerField', [], {}),
+            'n_cuotas': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['Sistema_Principal.T_financiacion']", 'symmetrical': 'False'}),
             'vendedor': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Usuario']"})
         },
         u'Sistema_Principal.empresa': {
@@ -226,7 +240,7 @@ class Migration(SchemaMigration):
             'chaleco': ('django.db.models.fields.IntegerField', [], {'max_length': '10'}),
             'empresa': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Empresa']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'moto_asociada': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Moto']", 'unique': 'True'}),
+            'placa': ('django.db.models.fields.IntegerField', [], {'max_length': '10'}),
             'soat': ('django.db.models.fields.IntegerField', [], {'max_length': '10'}),
             'transporte': ('django.db.models.fields.IntegerField', [], {'max_length': '10'})
         },
@@ -234,7 +248,6 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Matricula'},
             'empresa': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Empresa']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'kit_asociado': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Kit']"}),
             'nombre_ciudad': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'precio': ('django.db.models.fields.IntegerField', [], {'max_length': '20'})
         },
@@ -243,16 +256,18 @@ class Migration(SchemaMigration):
             'cuota_minima': ('django.db.models.fields.IntegerField', [], {'max_length': '15'}),
             'empresa': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Empresa']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'kit_asociado': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Kit']"}),
+            'matricula_asociada': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Matricula']"}),
             'modelo': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'nombre_fabr': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
             'precio_publico': ('django.db.models.fields.IntegerField', [], {'max_length': '14'}),
-            'referencia': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+            'referencia': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
         u'Sistema_Principal.t_financiacion': {
             'Meta': {'object_name': 'T_financiacion'},
             'empresa': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Sistema_Principal.Empresa']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'num_meses': ('django.db.models.fields.IntegerField', [], {'max_length': '2'}),
+            'num_meses': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'max_length': '2'}),
             'valor_por': ('django.db.models.fields.FloatField', [], {})
         },
         u'Sistema_Principal.usuario': {
@@ -261,7 +276,6 @@ class Migration(SchemaMigration):
             'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'max_length': '254'}),
             'empresa': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['Sistema_Principal.Empresa']", 'null': 'True', 'blank': 'True'}),
             'es_admin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'es_superadmin': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'esta_activo': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

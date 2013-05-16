@@ -8,15 +8,18 @@ from django.contrib.auth.models import Group,Permission
 # Create your models here.
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100,help_text=("Nombre de la Empresa"))
-    nit = models.CharField(max_length=10,null=False,unique=True)
+    nit = models.CharField(max_length=10,null=False,unique=True,verbose_name="NIT")
     ciudad = models.CharField(max_length=50,null=False)
     direccion = models.CharField(max_length=200,help_text=("Direccion de la Empresa"))
     telefono = models.CharField(max_length=10, help_text=("Telefono de la Empresa"))
     imagen = models.ImageField(upload_to="logos/")
     correo = models.EmailField(max_length=75)
-    cuotas_no_aplic = models.IntegerField(max_length=1,null=False)
+    cuotas_no_aplic = models.IntegerField(max_length=1,null=False,verbose_name="Cuotas No Aplicadas")
     def __unicode__(self):
         return self.nombre
+    class Meta:
+        verbose_name="Empresa"
+        verbose_name_plural="Empresas"
     
 class UsuarioManager(BaseUserManager):
     def create_user(self,username,email,nombre=None,apellidos=None,password=None):
@@ -28,9 +31,6 @@ class UsuarioManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self.db)
-        user.user_permissions = []
-        user.user_permissions.add('Sistema_Principal.add_cotizacion')
-        user.user_permissions.add('Sistema_Principal.add_cliente')
         user.save()
         return user
     def create_superuser(self, email, username, password):
@@ -47,9 +47,6 @@ class UsuarioManager(BaseUserManager):
         sicobotero = Empresa.objects.create(nombre="SiCoBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
         sicobotero.save()
         user.empresa.add(sicobotero)
-        super_admins = Group.objects.create(name = "super_admins")
-        super_admins.save()
-        user.groups.add(super_admins,)
         user.save(using=self._db)
         return user
     def get_by_natural_key(self,username):
@@ -62,13 +59,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     nombre = models.CharField(max_length=20,help_text=("Nombre del vendedor"))
     apellidos = models.CharField(max_length=40,help_text=("Apellidos del vendedor"))
     empresa = models.ManyToManyField(Empresa,blank=True,null=True)
-    esta_activo = models.BooleanField(default=True)
-    es_admin = models.BooleanField(default=False)
+    esta_activo = models.BooleanField(default=True,verbose_name="¿Esta activo?")
+    es_admin = models.BooleanField(default=False,verbose_name="¿Es administrador?")
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
     objets = UsuarioManager()
     class Meta:
-        pass
+        verbose_name="Usuario"
+        verbose_name_plural="Usuarios"
     def get_full_name(self):
         # The user is identified by their email address
         return self.nombre+" "+self.apellidos
@@ -99,50 +97,63 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         return self.esta_activo
 
 class Cliente(models.Model):
-    cedula = models.CharField(max_length=10,help_text=("Cedula del Cliente"),unique=True)
+    cedula = models.CharField(max_length=20,help_text=("Cedula del Cliente"),unique=True)
     nombre = models.CharField(max_length=20,help_text=("Nombre del Cliente"),null=False)
     apellidos = models.CharField(max_length=40,help_text=("Apellidos del Cliente"),null=False)
     direccion = models.CharField(max_length=200,help_text=("Direccion de Cliente"),null=False)
     telefono = models.CharField(max_length=10, help_text=("Telefono del Cliente"),null=False)
     email = models.CharField(max_length=60, help_text=("Correo del cliente"),null=False)
-    not_por_email = models.BooleanField()
+    not_por_email = models.BooleanField(verbose_name="Notificar por Email")
     empresa = models.ForeignKey(Empresa)
     def __unicode__(self):
         return self.nombre+" "+self.apellidos+" : "+self.cedula
+    class Meta:
+        verbose_name="Cliente"
+        verbose_name_plural="Clientes"
+
+
+class Matricula(models.Model):
+    nombre_ciudad = models.CharField(max_length=20,null=False,unique=True)
+    precio = models.IntegerField(max_length=20,null=False)
+    empresa = models.ForeignKey(Empresa,null=False)
+    def __unicode__(self):
+        return self.nombre_ciudad
+    class Meta:
+        verbose_name="Matricula"
+        verbose_name_plural="Matriculas"
 
 class Moto(models.Model):
-    nombre_fabr = models.CharField(max_length=15,help_text=("Fabricante de la moto"),null=False)
-    referencia = models.CharField(max_length=30,null=False,help_text=("Referencia de la moto"))
+    nombre_fabr = models.CharField(max_length=15,help_text=("Fabricante de la moto"),null=False,verbose_name="Nombre Fabricante")
+    referencia = models.CharField(max_length=30,null=False,help_text=("Referencia de la moto"),unique=True)
     modelo = models.CharField(max_length=30,help_text=("Modelo de la moto"),null=False)
-    precio_publico = models.IntegerField(max_length=14,null=False)
-    cuota_minima = models.IntegerField(max_length=15,null=False)
+    precio_publico = models.IntegerField(max_length=14,null=False,verbose_name="Precio al Publico")
+    cuota_minima = models.IntegerField(max_length=15,null=False,verbose_name="Cuota Minima")
     empresa = models.ForeignKey(Empresa,null=False)
     def __unicode__(self):
         return self.nombre_fabr+" "+self.referencia+" "+self.modelo
     def __srt__(self):
-        return self.nombre_fabr+" "+self.referencia+" "+self.modelo 
+        return self.nombre_fabr+" "+self.referencia+" "+self.modelo
+    class Meta:
+        verbose_name="Moto"
+        verbose_name_plural="Motos"
 
 class Kit(models.Model):
-    soat = models.IntegerField(max_length=10, null=False)
+    soat = models.IntegerField(max_length=10, null=False,verbose_name="SOAT")
     casco = models.IntegerField(max_length=10, null=False)
     chaleco = models.IntegerField(max_length=10, null=False)
     transporte = models.IntegerField(max_length=10, null=False)
+    placa = models.IntegerField(max_length=10,null=False)
     empresa = models.ForeignKey(Empresa,null=False)
-    moto_asociada = models.ForeignKey(Moto,null=False,unique=True)
+    moto_asociada = models.ForeignKey(Moto,verbose_name="Moto Asociada")
     def __unicode__(self):
         return self.moto_asociada.nombre_fabr+" "+self.moto_asociada.referencia+" "+self.moto_asociada.modelo
-
-class Matricula(models.Model):
-    nombre_ciudad = models.CharField(max_length=20,null=False)
-    precio = models.IntegerField(max_length=20,null=False)
-    empresa = models.ForeignKey(Empresa,null=False)
-    kit_asociado = models.ForeignKey(Kit,null=False)
-    def __unicode__(self):
-        return self.nombre_ciudad
+    class Meta:
+        verbose_name="Kit"
+        verbose_name_plural="Kits"
 
 class Inventario_motos(models.Model):
-    moto = models.ForeignKey(Moto,null=False)
-    en_venta = models.BooleanField(null=False)
+    moto = models.ForeignKey(Moto,null=False,unique=True)
+    en_venta = models.BooleanField(null=False,verbose_name="¿En venta?")
     empresa = models.ForeignKey('Empresa',null=False)
     
     def __unicode__(self):
@@ -153,8 +164,8 @@ class Inventario_motos(models.Model):
 
     
 class T_financiacion(models.Model):
-    num_meses = models.IntegerField(max_length=2,null=False,unique=True)
-    valor_por = models.FloatField(null=False)
+    num_meses = models.IntegerField(max_length=2,null=False,unique=True,verbose_name="Meses")
+    valor_por = models.FloatField(null=False,verbose_name="Valor Porcentual")
     empresa = models.ForeignKey(Empresa,null=False)
     def __unicode__(self):
         return str(self.num_meses)
@@ -164,9 +175,14 @@ class T_financiacion(models.Model):
 
 
 class Cotizacion(models.Model):
-    fecha_cot = models.DateField(auto_now=True)
+    fecha_cot = models.DateField(auto_now=True,verbose_name="Fecha de cotización")
     moto = models.ForeignKey(Moto)
     vendedor = models.ForeignKey(settings.AUTH_USER_MODEL)
     cliente = models.ForeignKey(Cliente)
-    n_cuotas = models.IntegerField()
-    cuota_inicial = models.IntegerField()
+    n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N° de Cuotas")
+    cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
+    matricula_asociada = models.ManyToManyField(Matricula,null=False,verbose_name="Matricula Asociada")
+    empresa = models.ForeignKey(Empresa)
+    class Meta:
+        verbose_name="Cotización"
+        verbose_name_plural="Cotizaciones"

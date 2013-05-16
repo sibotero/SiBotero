@@ -3,8 +3,8 @@
 {% block scripts %}
 <script>
     $(document).ready(function (){
-        $("#s1").select2();
-        $("#s2").select2();
+        $("#id_moto").select2();
+        $("#id_cliente").select2();
         $("#pop").dialog({autoOpen:false,
             title:"Agregar Cliente",
             resizable:false,
@@ -18,6 +18,9 @@
             window.open("/add_cliente/","_blank",'width=500,height=600');
         });
 
+        $("#form_cot").submit(function(event){
+            $.post("/cotizacion/",this)
+        });
 
     });
 </script>
@@ -25,45 +28,17 @@
 
 {% block content-main %}
 <div id="cotizacion-datos">
-    <form>
-        <fieldset>
-        <p><label class="field" for="cliente">Cliente : </label>
-        <select name="cliente" id="s2">
-            {% for cliente in clientes %}
-            <option value="{{ cliente.id }}">{{ cliente.nombre|add:" "|add:cliente.apellidos|concat:" "|concat:"cc: "|concat:cliente.cedula }}</option>
-            {% endfor %}
-        </select>
-        <a id="openPop" href="#"><img id="add_cliente" src="/static/cotizacion/img/list-add.png" />Nuevo Cliente</a>
-        </p>
-        <p><label class="field" for ="moto"> Moto : </label>
-        <select name="moto" id="s1">
-            {% for moto in motos %}
-            <option value="{{ moto.id }}">{{ ""|concat:moto.nombre_fabr|concat:" "|concat:moto.referencia|concat:" "|concat:moto.modelo }}</option>
-            {% endfor %}
-        </select>
-        </p>
-        <p><label class="field">Cuotas</label>
-        <div id="grid_cuotas">
-        {% for tasa in tasas %}
-        <input type="checkbox" value="{{ tasa.id }}" name="{{ tasa.num_meses }}cuotas"/>
-            <label for="1cuotas" >{{ tasa.num_meses }}</label>
-        {% endfor %}
-        </div></p>
-        <p><label class="field" for="cuota_inicial">Cuota Inicial : </label>
-            <input type="text" placeholder="cuota inicial"/></p>
-        <p><label class="aplicar_vip" for="vip_cli">¿Cliente especial?</label>
-            <input type="checkbox"></p>
-        <p>
-            <input type="submit" value="Realizar" />
-        </p>
-        </fieldset>
-    </form>
-    </div>
-    <div id="resultado-cotizacion">
-
-    </div>
-
-    <div id="pop">
-
-    </div>
+<form id="form_cot" method="POST">{% csrf_token %}
+<table>
+<tr><th><label for="id_moto">Moto:</label></th><td>{{ form.moto }}</td></tr>
+<tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}<a id="openPop" href="#"><img id="add_cliente" src="/static/cotizacion/img/list-add.png" />Nuevo Cliente</a></td></tr>
+<tr><th><label for="id_n_cuotas">N° de Cuotas:</label></th><td>{{ form.n_cuotas }}<br/>
+    <span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span>
+</td></tr>
+<tr><th><label for="id_cuota_inicial">Cuota Inicial:</label></th><td>{{ form.cuota_inicial }}</td></tr>
+<tr><th><label for="id_matricula_asociada">Matricula Asociada:</label></th><td>{{ form.matricula_asociada }}<br/><span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span></td></tr>
+</table>
+    <input type="submit" value="Realizar" id="cotizar"/>
+</form>
+</div>
 {% endblock %}
