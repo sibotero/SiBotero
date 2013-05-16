@@ -1,0 +1,55 @@
+td{
+    font-size: 15px;
+}
+
+thead td{
+    font-weight: bold;
+}
+
+thead tr{
+    background-color:#003366;
+    color:white;
+}
+
+
+
+#header_reporte{
+    font-weight: bold;
+}
+
+#body_reporte h4{
+    font-weight: lighter;
+}
+
+#body_reporte span{
+    font-weight: bold;
+}
+
+#header_reporte h4{
+    display: inline-block;
+    font-weight: lighter;
+}
+
+#header_reporte span:first-of-type{
+    padding-left: 0px;
+}
+
+
+#header_reporte span{
+    padding-left: 10px;
+}
+
+#header_reporte img{
+    display:inline-block;
+}
+
+#header_reporte h1{
+    display: inline-block;
+}
+
+#left_side, #right_side{
+    width: 40%;
+    display: inline-block;
+    padding-top: 4px;
+    vertical-align: top;
+}

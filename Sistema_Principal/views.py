@@ -83,6 +83,7 @@ def cotizacion(request):
 def report_cot(request,id_cot):
     cot = Cotizacion.objects.get(id=id_cot)
     moto = cot.moto.precio_publico
+    moto_obj = Moto.objects.get(pk = cot.moto.id)
     kit = cot.moto.kit_set.all()[0]
     kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
     n_cuotas = cot.n_cuotas.all()[0:]
@@ -105,8 +106,12 @@ def report_cot(request,id_cot):
                 l_preciot_cuotas[i].append(int(el/fin.num_meses))
 
     print l_preciot_cuotas
-    print c_ini
-    return render_to_response("cotizador/reporte.html",{},context_instance=RequestContext(request))
+
+    return render_to_response("cotizador/reporte.html",{
+        'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
+        'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
+        'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas
+    },context_instance=RequestContext(request))
 
 def logout(request):
     auth_logout(request)
