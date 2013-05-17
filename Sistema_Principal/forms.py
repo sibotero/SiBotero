@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django import forms
-from Sistema_Principal.models import Cotizacion
+from Sistema_Principal.models import Cotizacion,Moto,Empresa
 
 class AgregarCliente(forms.Form):
     cedula = forms.IntegerField(help_text=("Cedula del Cliente"),required=True,widget=forms.TextInput(attrs={'class':'required'}))
@@ -15,3 +15,21 @@ class CotizarForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
         exclude=['empresa','fecha_cot','vendedor']
+
+    def clean_cuota_inicial(self):
+        data = self.cleaned_data['cuota_inicial']
+        minima = self.cleaned_data['moto']
+        if(data < minima.cuota_minima):
+            raise forms.ValidationError("La cuota minima para la Moto seleccionada es : "+str(minima.cuota_minima))
+        return data
+
+    def clean_n_cuotas(self):
+        moto = self.cleaned_data['moto']
+        empresa = Empresa.objects.get(id = moto.empresa_id)
+        vip = self.cleaned_data['no_aplicables']
+        data = self.cleaned_data['n_cuotas']
+        print data
+        for t in data:
+            if vip and t.num_meses > empresa.cuotas_no_aplic:
+                raise forms.ValidationError("Si se es VIP no puede tener cuotas mayores a "+str(empresa.cuotas_no_aplic))
+        return data

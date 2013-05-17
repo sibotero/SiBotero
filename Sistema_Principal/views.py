@@ -13,6 +13,7 @@ from Sistema_Principal.forms import CotizarForm
 from Sistema_Principal.html2pdf import converter as html2pdf
 from io import BytesIO
 from django.core import mail
+from django.utils import simplejson
 from datetime import datetime
 
 
@@ -81,7 +82,8 @@ def cotizacion(request):
             add.save()
             form.save_m2m()
             return HttpResponseRedirect("/reportar/%s/"%(add.id))
-
+        else:
+            return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas,'form':form},context_instance= RequestContext(request))
 
 
 def report_cot(request,id_cot):
@@ -194,3 +196,9 @@ def get_dic_to_report(request,id_cot):
         'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas,'request':request,'id_cot':id_cot,
         'user':request.user
     }
+
+def is_vip(request,id_cli):
+    to_json = {'vip':Cliente.objects.get(id=id_cli).es_vip,}
+    json = simplejson.dumps(to_json)
+    print json
+    return HttpResponse(json,mimetype="application/json")

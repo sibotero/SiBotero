@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^reportar/(?P<id_cot>.*)/$',report_cot,name="reportar"),
     url(r'^reportarpdf/(?P<id_cot>.*)/$',report_cot_pdf,name="reportarpdf"),
     url(r'^reportemail/(?P<id_cot>.*)/$',pdf_a_mail,name="reportemail"),
+    url(r'^vip_cli/(?P<id_cli>.*)/$',is_vip,name="isvip"),
     url(r'^thanks/',gracias,name="gracias"),
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),
 )

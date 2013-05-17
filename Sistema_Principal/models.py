@@ -104,6 +104,7 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=10, help_text=("Telefono del Cliente"),null=False)
     email = models.CharField(max_length=60, help_text=("Correo del cliente"),null=False)
     not_por_email = models.BooleanField(verbose_name="Notificar por Email")
+    es_vip = models.BooleanField(verbose_name="Usuario VIP")
     empresa = models.ForeignKey(Empresa)
     def __unicode__(self):
         return self.nombre+" "+self.apellidos+" : "+self.cedula
@@ -178,10 +179,12 @@ class Cotizacion(models.Model):
     fecha_cot = models.DateField(auto_now=True,verbose_name="Fecha de cotización")
     moto = models.ForeignKey(Moto)
     vendedor = models.ForeignKey(settings.AUTH_USER_MODEL)
+    no_aplicables = models.BooleanField()
     cliente = models.ForeignKey(Cliente)
     n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N° de Cuotas")
     cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
     matricula_asociada = models.ManyToManyField(Matricula,null=False,verbose_name="Matricula Asociada")
+    n_no_aplicables = models.IntegerField(max_length=2)
     empresa = models.ForeignKey(Empresa)
     class Meta:
         verbose_name="Cotización"
