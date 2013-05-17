@@ -151,6 +151,12 @@ AUTH_USER_MODEL='Sistema_Principal.Usuario'
 # more details on how to customize your logging configuration.
 LOGIN_URL = "/login/"
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'sicobotero@gmail.com'
+EMAIL_HOST_PASSWORD = 's1c0b0t3r0'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

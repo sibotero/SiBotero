@@ -6,6 +6,12 @@
 {% endblock %}
 {% block scripts %}
 <script>
+    $(document).ready(function(){
+        $("#topdf").click(function(event){
+            event.preventDefault()
+            window.open("/reportarpdf/{{ id_cot }}/","_blank",'width=800,height=600');
+        });
+    });
 </script>
 {% endblock %}
 
@@ -49,4 +55,8 @@
 </table>
 </div>
 </div>
+    <div id="options">
+<a href="/reportemail/{{ id_cot }}"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
+<a id="topdf" href="#"><img src="/static/cotizacion/img/acroread.png">Ver/Imprimir PDF</a>
+    </div>
 {% endblock %}

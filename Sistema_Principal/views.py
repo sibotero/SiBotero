@@ -12,7 +12,7 @@ from Sistema_Principal.forms import AgregarCliente
 from Sistema_Principal.forms import CotizarForm
 from Sistema_Principal.html2pdf import converter as html2pdf
 from io import BytesIO
-from xml.dom.minidom import Document
+from django.core import mail
 from datetime import datetime
 
 
@@ -85,76 +85,22 @@ def cotizacion(request):
 
 
 def report_cot(request,id_cot):
-    cot = Cotizacion.objects.get(id=id_cot)
-    moto = cot.moto.precio_publico
-    moto_obj = Moto.objects.get(pk = cot.moto.id)
-    kit = cot.moto.kit_set.all()[0]
-    kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
-    n_cuotas = cot.n_cuotas.all()[0:]
-    m_asociadas = cot.matricula_asociada.all()[0:]
-    c_ini = cot.cuota_inicial
-    sin_mat = moto + kit_total
-    l_con_mat = []
-    for i,mat in enumerate(m_asociadas):
-        print i
-        l_con_mat.append( (sin_mat+mat.precio) - c_ini )
-    print l_con_mat
-    l_preciot_cuotas = []
+    ctx = get_dic_to_report(request,id_cot)
 
-    for i,el in enumerate(l_con_mat):
-        l_preciot_cuotas.append([])
-        for j,fin in enumerate(n_cuotas):
-            if fin.valor_por != 0:
-                l_preciot_cuotas[i].append(int(el*fin.valor_por))
-            else:
-                l_preciot_cuotas[i].append(int(el/fin.num_meses))
-
-    print l_preciot_cuotas
-
-    return render_to_response("cotizador/reporte.html",{
-        'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
-        'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
-        'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas
-    },context_instance=RequestContext(request))
+    return render_to_response("cotizador/reporte.html",ctx,context_instance=RequestContext(request))
 
 
 def report_cot_pdf(request,id_cot):
     filename = "temp"+str(datetime.now())+".pdf"
     buffer = BytesIO()
 
-    cot = Cotizacion.objects.get(id=id_cot)
-    moto = cot.moto.precio_publico
-    moto_obj = Moto.objects.get(pk = cot.moto.id)
-    kit = cot.moto.kit_set.all()[0]
-    kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
-    n_cuotas = cot.n_cuotas.all()[0:]
-    m_asociadas = cot.matricula_asociada.all()[0:]
-    c_ini = cot.cuota_inicial
-    sin_mat = moto + kit_total
-    l_con_mat = []
-    for i,mat in enumerate(m_asociadas):
-        print i
-        l_con_mat.append( (sin_mat+mat.precio) - c_ini )
-    print l_con_mat
-    l_preciot_cuotas = []
-
-    for i,el in enumerate(l_con_mat):
-        l_preciot_cuotas.append([])
-        for j,fin in enumerate(n_cuotas):
-            if fin.valor_por != 0:
-                l_preciot_cuotas[i].append(int(el*fin.valor_por))
-            else:
-                l_preciot_cuotas[i].append(int(el/fin.num_meses))
+    ctx = get_dic_to_report(request,id_cot)
 
     """ Aca se traera la informacion en html del resultado y se escribira en
     el pdf
     """
     print request.session['enterprise'].imagen.path
-    return html2pdf.render_to_pdf("cotizador/pdf_report.html",{
-        'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
-        'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
-        'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas, 'request':request,'user':request.user
-    },pdfname=str(datetime.now())+".pdf")
+    return html2pdf.render_to_pdf("cotizador/pdf_report.html",ctx,pdfname=str(datetime.now())+".pdf")
 
 def logout(request):
     auth_logout(request)
@@ -195,3 +141,56 @@ def add_cliente(request):
 def gracias(request):
     return render_to_response("cotizador/thanks.html",{},context_instance=RequestContext(request))
 
+def pdf_a_mail(request,id_cot):
+    cot = Cotizacion.objects.get(id = id_cot)
+    if cot != None:
+        email = cot.cliente.email
+        empresa = request.session['enterprise']
+        subject = 'Cotizacion en '+empresa.nombre+' '+str(datetime.today())
+        body = unicode("\n"+"\n"+"Este mensaje fue autogenerado por el sistema. Por favor no contestar este mensaje\n"+ "Empresa : "+empresa.nombre+" Telefono: "+empresa.telefono+" Correo:"+empresa.correo+"\n"+"Direccion : "+empresa.direccion+"         \n"+"NIT: "+empresa.nit+"  Ciudad: "+empresa.ciudad+".")
+        efrom = "sicobotero@hotmail.com"
+        ctx = get_dic_to_report(request,id_cot)
+        file_att = html2pdf.info_to_pdf("cotizador/pdf_report.html",ctx,pdfname=str(datetime.now())+".pdf")
+        print file_att.content.decode("windows-1252")
+        message = mail.EmailMessage(subject,body,efrom,to=[email,],headers = {'Reply-To': efrom})
+        message.attach("Reporte.pdf",file_att.content,mimetype="application/pdf")
+        message.send()
+        return HttpResponseRedirect('/reportar/'+str(id_cot)+"/")
+        pass
+    else:
+        return HttpResponse(status=404)
+    pass
+
+def get_dic_to_report(request,id_cot):
+    cot = Cotizacion.objects.get(id=id_cot)
+    moto = cot.moto.precio_publico
+    moto_obj = Moto.objects.get(pk = cot.moto.id)
+    kit = cot.moto.kit_set.all()[0]
+    kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
+    n_cuotas = cot.n_cuotas.all()[0:]
+    m_asociadas = cot.matricula_asociada.all()[0:]
+    c_ini = cot.cuota_inicial
+    sin_mat = moto + kit_total
+    l_con_mat = []
+    for i,mat in enumerate(m_asociadas):
+        print i
+        l_con_mat.append( (sin_mat+mat.precio) - c_ini )
+    print l_con_mat
+    l_preciot_cuotas = []
+
+    for i,el in enumerate(l_con_mat):
+        l_preciot_cuotas.append([])
+        for j,fin in enumerate(n_cuotas):
+            if fin.valor_por != 0:
+                l_preciot_cuotas[i].append(int(el*fin.valor_por))
+            else:
+                l_preciot_cuotas[i].append(int(el/fin.num_meses))
+
+    print l_preciot_cuotas
+
+    return{
+        'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
+        'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
+        'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas,'request':request,'id_cot':id_cot,
+        'user':request.user
+    }
