@@ -14,22 +14,41 @@ class AgregarCliente(forms.Form):
 class CotizarForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
-        exclude=['empresa','fecha_cot','vendedor']
+        exclude=['empresa','fecha_cot','vendedor','n_no_aplicables']
 
-    def clean_cuota_inicial(self):
-        data = self.cleaned_data['cuota_inicial']
-        minima = self.cleaned_data['moto']
-        if(data < minima.cuota_minima):
-            raise forms.ValidationError("La cuota minima para la Moto seleccionada es : "+str(minima.cuota_minima))
-        return data
+    def clean_moto(self):
+        print "good moto -> "+self.cleaned_data['moto'].nombre_fabr
+        return self.cleaned_data['moto']
+
+    def clean_no_aplicables(self):
+        print "good no_aplicables -> ",str(self.cleaned_data['no_aplicables'])
+        return self.cleaned_data['no_aplicables']
+
+    def clean_cliente(self):
+        print "good cliente -> "+self.cleaned_data['cliente'].nombre
+        return self.cleaned_data['cliente']
 
     def clean_n_cuotas(self):
         moto = self.cleaned_data['moto']
         empresa = Empresa.objects.get(id = moto.empresa_id)
         vip = self.cleaned_data['no_aplicables']
         data = self.cleaned_data['n_cuotas']
-        print data
+        print "n cuotas -> ",data
         for t in data:
             if vip and t.num_meses > empresa.cuotas_no_aplic:
                 raise forms.ValidationError("Si se es VIP no puede tener cuotas mayores a "+str(empresa.cuotas_no_aplic))
         return data
+
+    def clean_cuota_inicial(self):
+        data = self.cleaned_data['cuota_inicial']
+        minima = self.cleaned_data['moto']
+        if(data < minima.cuota_minima):
+            raise forms.ValidationError("La cuota minima para la Moto seleccionada es : "+str(minima.cuota_minima))
+        print "cuota inicial -> ",data
+        return data
+
+    def clean_matricula_asociada(self):
+        data = self.cleaned_data['matricula_asociada']
+        print "cuota inicial -> ",data
+        return data
+

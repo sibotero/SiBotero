@@ -79,6 +79,7 @@ def cotizacion(request):
             add.fecha_cot = datetime.today()
             add.empresa = request.session['enterprise']
             add.vendedor = request.user
+            add.n_no_aplicables = request.session['enterprise'].cuotas_no_aplic
             add.save()
             form.save_m2m()
             return HttpResponseRedirect("/reportar/%s/"%(add.id))
@@ -183,10 +184,13 @@ def get_dic_to_report(request,id_cot):
     for i,el in enumerate(l_con_mat):
         l_preciot_cuotas.append([])
         for j,fin in enumerate(n_cuotas):
-            if fin.valor_por != 0:
-                l_preciot_cuotas[i].append(int(el*fin.valor_por))
-            else:
+            if cot.no_aplicables:
                 l_preciot_cuotas[i].append(int(el/fin.num_meses))
+            else:
+                if fin.valor_por != 0:
+                    l_preciot_cuotas[i].append(int(el*fin.valor_por))
+                else:
+                    l_preciot_cuotas[i].append(int(el/fin.num_meses))
 
     print l_preciot_cuotas
 
