@@ -14,12 +14,7 @@
     {% if request.session.url_image != null %}
                 <img src="{{ request.session.url_image }} "  width='160px' height='110px'/>
     {% endif %}
-    <h1>{{ request.session.enterprise.nombre }}</h1><br>
-    <span>Ciudad :</span> <h4>{{ request.session.enterprise.ciudad }}</h4>
-    <span>Direccion :</span> <h4> {{ request.session.enterprise.direccion }}</h4>
-    <span>Telefono :</span> <h4>{{ request.session.enterprise.telefono }}</h4>
-    <span>Correo Electronico :</span> <h4>{{ request.session.enterprise.correo }}</h4><br>
-    <span>Cotizacion Fecha :</span> <h4>{{ cot.fecha_cot }}</h4>
+    <h1><span>Cotizacion Fecha :</span>{{ cot.fecha_cot }}</h1>
 </div>
 <div id ="body_reporte">
 <div id="left_side">

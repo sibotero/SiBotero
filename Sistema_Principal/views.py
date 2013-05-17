@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
 # Create your views here.
 
-from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render
+from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render, HttpResponse
+from django.template.loader import render_to_string
 from django.template.context import RequestContext
 from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion
 from django.contrib.auth import authenticate
@@ -9,6 +10,9 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from Sistema_Principal.forms import AgregarCliente
 from Sistema_Principal.forms import CotizarForm
+from Sistema_Principal.html2pdf import converter as html2pdf
+from io import BytesIO
+from xml.dom.minidom import Document
 from datetime import datetime
 
 
@@ -112,6 +116,45 @@ def report_cot(request,id_cot):
         'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
         'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas
     },context_instance=RequestContext(request))
+
+
+def report_cot_pdf(request,id_cot):
+    filename = "temp"+str(datetime.now())+".pdf"
+    buffer = BytesIO()
+
+    cot = Cotizacion.objects.get(id=id_cot)
+    moto = cot.moto.precio_publico
+    moto_obj = Moto.objects.get(pk = cot.moto.id)
+    kit = cot.moto.kit_set.all()[0]
+    kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
+    n_cuotas = cot.n_cuotas.all()[0:]
+    m_asociadas = cot.matricula_asociada.all()[0:]
+    c_ini = cot.cuota_inicial
+    sin_mat = moto + kit_total
+    l_con_mat = []
+    for i,mat in enumerate(m_asociadas):
+        print i
+        l_con_mat.append( (sin_mat+mat.precio) - c_ini )
+    print l_con_mat
+    l_preciot_cuotas = []
+
+    for i,el in enumerate(l_con_mat):
+        l_preciot_cuotas.append([])
+        for j,fin in enumerate(n_cuotas):
+            if fin.valor_por != 0:
+                l_preciot_cuotas[i].append(int(el*fin.valor_por))
+            else:
+                l_preciot_cuotas[i].append(int(el/fin.num_meses))
+
+    """ Aca se traera la informacion en html del resultado y se escribira en
+    el pdf
+    """
+    print request.session['enterprise'].imagen.path
+    return html2pdf.render_to_pdf_response("cotizador/pdf_report.html",{
+        'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
+        'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
+        'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas, 'request':request,'user':request.user
+    },pdfname=str(datetime.now())+".pdf")
 
 def logout(request):
     auth_logout(request)
