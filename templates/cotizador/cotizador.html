@@ -14,8 +14,9 @@
                 location.reload();
             },width:600
         });
-
-        init = $.get("/vip_cli/"+value+"/",function(data){
+        initial = $("#id_cliente").select2("val")
+        if(initial != 0){
+        $.get("/vip_cli/"+initial+"/",function(data){
                     $("#id_no_aplicables").removeAttr("checked");
                     if(data.vip){
                         $("#id_no_aplicables").removeAttr('disabled')
@@ -24,7 +25,7 @@
                     }
 
                 })
-
+        }
         $("#openPop").click(function(){
             window.open("/add_cliente/","_blank",'width=500,height=600');
         });
