@@ -1,12 +1,40 @@
 <html>
 {% load extratags %}
 <head>
-    <link href="{{ STATIC_URL }}cotizacion/reporte.css" rel="stylesheet" type="text/css">
+   <style>
+    .thead{
+        background-color:lightblue;
+    }
+
+    .nothead{
+        font-weight: lighter;
+    }
+
+    .titulo{
+        font-size: 42px;
+    }
+
+    td{
+    font-size: 15px;
+    }
+
+    td{
+    font-weight: bold;
+    }
+
+    {
+    background-color:#003366;
+    color:white;
+    }
+
+   </style>
 </head>
 <body>
 <div id="header_reporte">
-    <img src="{{ request.session.enterprise.imagen.path }}" width='160px' height='110px'/>
-    <h1>{{ request.session.enterprise.nombre }}</h1><br>
+    {% if request.session.url_image != null %}
+        <img src="{{ request.session.enterprise.imagen.path }}" width='160px' height='110px'/>
+    {% endif %}
+    <h1 class=".titulo">{{ request.session.enterprise.nombre }}</h1><br>
     <span>Ciudad :</span> <h4>{{ request.session.enterprise.ciudad }}</h4>
     <span>Direccion :</span> <h4> {{ request.session.enterprise.direccion }}</h4>
     <span>Telefono :</span> <h4>{{ request.session.enterprise.telefono }}</h4>
@@ -18,19 +46,19 @@
 <table>
     <thead>
     <tr>
-        <td>Moto</td>
-        <td>Precio Publico</td>
-        <td>Precio Kit Total</td>
-        <td>Cuota Inicial</td>
-        <td>Vendedor</td>
+        <td class="thead">Moto</td>
+        <td class="thead">Precio Publico</td>
+        <td class="thead">Precio Kit Total</td>
+        <td class="thead">Cuota Inicial</td>
+        <td class="thead">Vendedor</td>
     </tr>
     </thead>
     <tr>
-    <td><h4>{{ objmoto.nombre_fab|add:" "|add:objmoto.referencia|add:" "|add:objmoto.modelo }} </h4></td>
-    <td><h4>{{ objmoto.precio_publico }}</h4></td>
-    <td><h4>{{ precio_kit }}</h4></td>
-    <td><h4>{{ cuota_inicial }}</h4></td>
-    <td><h4>{{ user.nombre|concat:" "|concat:user.apellidos }}</h4></td>
+    <td class="nothead"><h4>{{ objmoto.nombre_fab|add:" "|add:objmoto.referencia|add:" "|add:objmoto.modelo }} </h4></td>
+    <td class="nothead"><h4>{{ objmoto.precio_publico }}</h4></td>
+    <td class="nothead"><h4>{{ precio_kit }}</h4></td>
+    <td class="nothead"><h4>{{ cuota_inicial }}</h4></td>
+    <td class="nothead"><h4>{{ user.nombre|concat:" "|concat:user.apellidos }}</h4></td>
     </tr>
 </table>
 <span>Precio Matricula : </span>
@@ -42,9 +70,9 @@
 <table>
 <thead>
 <tr>
-    <td>Nombre Matricula</td>
+    <td class="thead">Nombre Matricula</td>
     {% for cot in n_cuotas %}
-        <td> {{ cot.num_meses }}</td>
+        <td class="thead"> {{ cot.num_meses }}</td>
     {% endfor %}
 </tr>
 </thead>
@@ -53,7 +81,7 @@
     <td>{{ m_asociadas|lookup:i }}</td>
     {% for j in n_cuotas|len %}
 
-        <td>$ {{ lista_total_cotizada|lookup:i|lookup:j }}</td>
+        <td class="nothead">$ {{ lista_total_cotizada|lookup:i|lookup:j }}</td>
 
     {% endfor %}
 </tr>

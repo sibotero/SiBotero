@@ -150,7 +150,7 @@ def report_cot_pdf(request,id_cot):
     el pdf
     """
     print request.session['enterprise'].imagen.path
-    return html2pdf.render_to_pdf_response("cotizador/pdf_report.html",{
+    return html2pdf.render_to_pdf("cotizador/pdf_report.html",{
         'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
         'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
         'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas, 'request':request,'user':request.user

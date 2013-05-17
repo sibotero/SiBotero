@@ -73,3 +73,21 @@ def render_to_pdf_response(template_name, context=None, pdfname=None):
         pdfname = '%s.pdf' % os.path.splitext(os.path.basename(template_name))[0]
     file_object['Content-Disposition'] = 'attachment; filename=%s' % pdfname
     return generate_pdf(template_name, file_object, context)
+
+def render_to_pdf(template_src, context_dict,pdfname="report.pdf"):
+   """Function to render html template into a pdf file"""
+   template = get_template(template_src)
+   context = Context(context_dict)
+   html = template.render(context)
+   result = StringIO.StringIO()
+
+   pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")),
+       dest=result,
+       encoding='UTF-8',
+   )
+   if not pdf.err:
+       response = HttpResponse(result.getvalue(),
+           mimetype='application/pdf')
+       return response
+
+   return HttpResponse('We had some errors<pre>%s</pre>' %escape(html))
