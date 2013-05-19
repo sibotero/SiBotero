@@ -28,7 +28,7 @@ def login(request):
             empresa = request.POST['enterprise']
             username = request.POST['username']
             password = request.POST['password']
-            print empresa+" "+username+" "+password
+            #print empresa+" "+username+" "+password
             user = authenticate(username=username,password=password)
             if not user==None:
                 empresasusr = list(user.empresa.all())
@@ -46,10 +46,10 @@ def login(request):
                     auth_login(request, user)
                     print "usuario logeado"
                     if user.es_admin:
-                        print "bienvenido administrador"
+                        #print "bienvenido administrador"
                         return redirect("/admin/",context_instance= RequestContext(request))
                     elif not user.es_admin:
-                        print "bienvenido usuario"
+                        #print "bienvenido usuario"
                         return redirect("/cotizacion/",context_instance= RequestContext(request))
                 else:
                     error = "Usuario/Empresa no validos"
@@ -70,7 +70,7 @@ def cotizacion(request):
     tasas = T_financiacion.objects.filter(empresa=empresa.id)
     if request.method == "GET":
         form = CotizarForm()
-        print form.as_table()
+        #print form.as_table()
         return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas,'form':form},context_instance= RequestContext(request))
     if request.method=="POST":
         form = CotizarForm(request.POST)
@@ -102,7 +102,7 @@ def report_cot_pdf(request,id_cot):
     """ Aca se traera la informacion en html del resultado y se escribira en
     el pdf
     """
-    print request.session['enterprise'].imagen.path
+    #print request.session['enterprise'].imagen.path
     return html2pdf.render_to_pdf("cotizador/pdf_report.html",ctx,pdfname=str(datetime.now())+".pdf")
 
 def logout(request):
@@ -111,14 +111,14 @@ def logout(request):
 
 def add_cliente(request):
     if request.method == "GET":
-        print "AQUI"
+        #print "AQUI"
         form_add = AgregarCliente()
-        print (form_add.as_p())
+        #print (form_add.as_p())
         return render_to_response("cotizador/form_cliente.html",{'form':form_add},context_instance=RequestContext(request))
     elif request.method =="POST":
         form = AgregarCliente(request.POST)
         if form.is_valid():
-            print "AQUI!!"
+            #print "AQUI!!"
             cedula = form.cleaned_data['cedula']
             nombre = form.cleaned_data['nombre']
             apellidos = form.cleaned_data['apellidos']
@@ -154,7 +154,7 @@ def pdf_a_mail(request,id_cot):
         efrom = "sicobotero@hotmail.com"
         ctx = get_dic_to_report(request,id_cot)
         file_att = html2pdf.info_to_pdf("cotizador/pdf_report.html",ctx,pdfname=str(datetime.now())+".pdf")
-        print file_att.content.decode("windows-1252")
+        #print file_att.content.decode("windows-1252")
         message = mail.EmailMessage(subject,body,efrom,to=[email,],headers = {'Reply-To': efrom})
         message.attach("Reporte.pdf",file_att.content,mimetype="application/pdf")
         message.send()
@@ -176,9 +176,9 @@ def get_dic_to_report(request,id_cot):
     sin_mat = moto + kit_total
     l_con_mat = []
     for i,mat in enumerate(m_asociadas):
-        print i
+        #print i
         l_con_mat.append( (sin_mat+mat.precio) - c_ini )
-    print l_con_mat
+    #print l_con_mat
     l_preciot_cuotas = []
 
     for i,el in enumerate(l_con_mat):
@@ -192,7 +192,7 @@ def get_dic_to_report(request,id_cot):
                 else:
                     l_preciot_cuotas[i].append(int(el/fin.num_meses))
 
-    print l_preciot_cuotas
+    #print l_preciot_cuotas
 
     return{
         'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
@@ -204,5 +204,5 @@ def get_dic_to_report(request,id_cot):
 def is_vip(request,id_cli):
     to_json = {'vip':Cliente.objects.get(id=id_cli).es_vip,}
     json = simplejson.dumps(to_json)
-    print json
+    #print json
     return HttpResponse(json,mimetype="application/json")

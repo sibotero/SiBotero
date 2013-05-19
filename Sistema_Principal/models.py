@@ -181,7 +181,7 @@ class Cotizacion(models.Model):
     vendedor = models.ForeignKey(settings.AUTH_USER_MODEL)
     no_aplicables = models.BooleanField()
     cliente = models.ForeignKey(Cliente)
-    n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N° de Cuotas")
+    n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N de Cuotas")
     cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
     matricula_asociada = models.ManyToManyField(Matricula,null=False,verbose_name="Matricula Asociada")
     n_no_aplicables = models.IntegerField(max_length=2)

@@ -13,10 +13,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'SiCoBotero',                      # Or path to database file if using sqlite3.
+        'NAME': 'SiBotero',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'root',
-        'PASSWORD': 'bxrrapido',
+        'USER': 'minrock',
+        'PASSWORD': 'BXRRapido1991',
         'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '3306',                      # Set to empty string for default.
     }
@@ -34,8 +34,8 @@ TIME_ZONE = 'America/Bogota'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'es-co'
-
+LANGUAGE_CODE = 'es-CO'
+DEFAULT_CHARSET = 'utf-8'
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
@@ -51,7 +51,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = '/home/minrock/Documents/Workspace/SiCoBotero/media/'
+MEDIA_ROOT = '/home/userweb/SiBotero/public/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -62,9 +62,9 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = '/home/minrock/Documents/Workspace/SiCoBotero/static/'
+STATIC_ROOT = '/home/userweb/SiCoBotero/public/static/'
 
-BASE_DIR = '/home/minrock/Documents/Workspace/SiCoBotero/'
+BASE_DIR = '/home/userweb/SiBotero/'
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
@@ -74,7 +74,6 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/minrock/Documents/Workspace/SiCoBotero/static_files/',
 )
 
 # List of finder classes that know how to find static files in
@@ -114,7 +113,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/home/minrock/Documents/Workspace/SiCoBotero/templates",
+    "/home/userweb/SiBotero/templates",
 )
 
 INSTALLED_APPS = (
@@ -127,7 +126,6 @@ INSTALLED_APPS = (
     'south',
     'Sistema_Principal',
     # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',

@@ -40,6 +40,9 @@
     <span>Telefono :</span> <h4>{{ request.session.enterprise.telefono }}</h4>
     <span>Correo Electronico :</span> <h4>{{ request.session.enterprise.correo }}</h4><br>
     <span>Cotizacion Fecha :</span> <h4>{{ cot.fecha_cot }}</h4>
+    <br>
+    <span>Cliente : {{ cot.cliente.nombre|concat:" "|concat:cot.cliente.apellidos }}</span>
+    <span>C.C : {{ cot.cliente.cedula }}</span>
 </div>
 <div id ="body_reporte">
 <div id="left_side">
