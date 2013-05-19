@@ -15,8 +15,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'SiBotero',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
-        'USER': 'minrock',
-        'PASSWORD': 'BXRRapido1991',
+        #'USER': 'minrock',
+        'USER': 'root',
+        # 'PASSWORD': 'BXRRapido1991'
+        'PASSWORD': 'bxrrapido',
         'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '3306',                      # Set to empty string for default.
     }
@@ -51,7 +53,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = '/home/userweb/SiBotero/public/media/'
+MEDIA_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__),'../public/media/'))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -62,9 +64,9 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = '/home/userweb/SiCoBotero/public/static/'
+STATIC_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__),'../public/static/'))
 
-BASE_DIR = '/home/userweb/SiBotero/'
+
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
@@ -74,6 +76,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.normpath(os.path.join(os.path.dirname(__file__),'../static/')),
 )
 
 # List of finder classes that know how to find static files in
@@ -113,7 +116,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/home/userweb/SiBotero/templates",
+    #"/home/userweb/SiBotero/templates",
+    os.path.normpath(os.path.join(os.path.dirname(__file__),'../templates/')),
 )
 
 INSTALLED_APPS = (

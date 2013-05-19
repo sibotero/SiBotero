@@ -88,12 +88,16 @@ def cotizacion(request):
 
 
 def report_cot(request,id_cot):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
     ctx = get_dic_to_report(request,id_cot)
 
     return render_to_response("cotizador/reporte.html",ctx,context_instance=RequestContext(request))
 
 
 def report_cot_pdf(request,id_cot):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
     filename = "temp"+str(datetime.now())+".pdf"
     buffer = BytesIO()
 
@@ -110,6 +114,8 @@ def logout(request):
     return redirect("/login/")
 
 def add_cliente(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
     if request.method == "GET":
         #print "AQUI"
         form_add = AgregarCliente()
@@ -142,9 +148,13 @@ def add_cliente(request):
             #return render_to_response("cotizador/form_cliente.html",{'form':form},context_instance=RequestContext(request))
 
 def gracias(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
     return render_to_response("cotizador/thanks.html",{},context_instance=RequestContext(request))
 
 def pdf_a_mail(request,id_cot):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
     cot = Cotizacion.objects.get(id = id_cot)
     if cot != None:
         email = cot.cliente.email
@@ -206,3 +216,7 @@ def is_vip(request,id_cli):
     json = simplejson.dumps(to_json)
     #print json
     return HttpResponse(json,mimetype="application/json")
+
+def secondadmin(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect("/login/")
