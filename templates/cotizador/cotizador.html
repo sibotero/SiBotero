@@ -55,20 +55,29 @@
 {% endblock %}
 
 {% block content-main %}
+<h1>Cotizacion</h1>
 <div id="cotizacion-datos">
 <form id="form_cot" method="POST">{% csrf_token %}
 <table>
 <tr><th><label for="id_moto">Moto:</label></th><td>{{ form.moto }}{{ form.moto.errors }}</td></tr>
 <tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}{{ form.cliente.errors }}<a id="openPop" href="#"><img id="add_cliente" src="/static/cotizacion/img/list-add.png" />Nuevo Cliente</a></td></tr>
+<tr><th><label for="id_medio">Medio publicitario:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
 <tr><th><label for="id_n_cuotas">N° de Cuotas:</label></th><td>{{ form.n_cuotas }}{{ form.n_cuotas.errors }}<br/>
     <span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span>
 </td></tr>
 <tr><th><label for="id_cuota_inicial">Cuota Inicial:</label></th><td>{{ form.cuota_inicial }}{{ form.cuota_inicial.errors }}</td></tr>
 <tr><th><label for="id_matricula_asociada">Matricula Asociada:</label></th><td>{{ form.matricula_asociada }}{{ form.matricula_asociada.errors }}<br/><span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span></td></tr>
-    <tr><th><label for="id_no_aplicables">Es VIP:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
+<tr><th><label for="id_no_aplicables">Es VIP:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
+
 </table>
 
     <input type="submit" value="Realizar" id="cotizar"/>
 </form>
 </div>
+{% endblock %}
+
+{% block sidebar %}
+    {% if user.is_staff %}
+            <a id="cont-panel" href="{% url 'admin:index' %}"><img src="/static/cotizacion/img/display.png"/><br>Administración</a>
+    {% endif %}
 {% endblock %}

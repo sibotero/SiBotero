@@ -16,11 +16,7 @@
 {% endblock %}
 <body class="dashboard">
 
-<!-- Container -->
-<div id="container">
-
-
-    <!-- Header -->
+<!-- Header -->
     <div id="header">
         <div id="branding">
 
@@ -44,9 +40,12 @@
 
     </div>
     <!-- END Header -->
+
+<!-- Container -->
+<div id="container">
     <!-- Content -->
-    <div id="content" class="colMS">
-    <h1>Cotizacion</h1>
+    <div id="content">
+
 
     <div id="content-main">
     {% block content-main %}
@@ -55,18 +54,23 @@
     {% endblock %}
     </div>
     <!-- END Content -->
-    {% if user.is_staff %}
-        <a id="cont-panel" href="{% url 'admin:index' %}"><img src="/static/cotizacion/img/display.png"/>Volver al panel de administración</a>
-    {% endif %}
 </div>
 <!-- END Container -->
+</div>
+
+{% if not is_popup %}
+        <div id="sidebar">
+        {% block sidebar %}
+        {% endblock %}
+        </div>
+    {% endif %}
+
 <div id="footer">
         <p>
             CopyRight . Powered By Django. A Django Proyect by: Luis Moncaris.
         </p>
 </div>
 <!--Footer-->
-</div>
 
 </body>
 </html>

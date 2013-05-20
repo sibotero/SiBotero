@@ -14,11 +14,7 @@
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 
-<!-- Container -->
-<div id="container">
-
-
-    <!-- Header -->
+<!-- Header -->
     <div id="header">
         <div id="branding">
             {% if request.session.url_image != null %}
@@ -44,12 +40,14 @@
         {% endif %}
         {% block nav-global %}{% endblock %}
     </div>
+
+
+
+<!-- Container -->
+<div id="container">
+
     <!-- END Header -->
     {% block breadcrumbs %}
-    <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    {% if title %} &rsaquo; {{ title }}{% endif %}
-    </div>
     {% endblock %}
 
 
@@ -62,7 +60,7 @@
     {% endblock messages %}
 
     <!-- Content -->
-    <div id="content" class="{% block coltype %}colM{% endblock %}">
+    <div id="content">
         {% block pretitle %}{% endblock %}
         {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
         {% block content %}
@@ -72,13 +70,22 @@
         {% block sidebar %}{% endblock %}
         <br class="clear" />
     </div>
-    <p><a id="cot-panel" href="{% url 'cotizacion' %}"><img src="/static/cotizacion/img/wallet.png"/>Ir a la aplicacion de Cotizacion</a></p>
     <!-- END Content -->
 
     {% block footer %}
     </div>{% endblock %}
 </div>
 <!-- END Container -->
+
+{% if not is_popup %}
+        <div id="sidebar">
+        {% if request.user.is_staff %}
+           <p><a id="cot-panel" href="{% url 'cotizacion' %}"><img src="/static/cotizacion/img/wallet.png"/><br>Ir a la aplicacion de Cotizacion</a></p>
+        {% endif %}
+
+        </div>
+    {% endif %}
+
 <div id="footer">
         <p>
             CopyRight . Powered By Django. A Django Proyect by: Luis Moncaris.

@@ -8,10 +8,11 @@ Created on May 3, 2013
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from Sistema_Principal.models import Usuario, Empresa, Cliente, Moto, Kit, Inventario_motos,T_financiacion,Matricula, Cotizacion
+from Sistema_Principal.models import Usuario, Empresa, Cliente, Moto, Kit, Inventario_motos,T_financiacion,Matricula, Cotizacion, Medio_Publicitario
 from django.contrib.sites.models import Site
 from datetime import datetime
 
@@ -137,6 +138,7 @@ class KitInLine(admin.TabularInline):
 class MotoAdmin(admin.ModelAdmin):
     list_display = ('nombre_fabr','referencia','modelo','precio_publico')
     list_filter = ('nombre_fabr',)
+    actions = ['really_delete_selected']
     exclude = ['empresa']
     inlines = [KitInLine,]
     def save_model(self, request, obj, form, change):
@@ -151,6 +153,17 @@ class MotoAdmin(admin.ModelAdmin):
             instance.empresa = request.session['enterprise']
             instance.save()
         formset.save()
+    def get_actions(self, request):
+        actions = super(MotoAdmin,self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+    def really_delete_selected(self,request,queryset):
+        for obj in queryset:
+            moto = Inventario_motos.objects.get(moto = obj)
+            moto.en_venta = False
+            moto.save()
+        self.message_user(request,"%s Motos fueron deshabilitadas del inventario"%queryset.count())
+    really_delete_selected.short_description = "Deshabilitar Motos del inventario"
 
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ("nombre","apellidos","cedula","telefono","direccion","email")
@@ -217,10 +230,21 @@ class CotizacionAdmin(admin.ModelAdmin):
         empresas = request.user.empresa.all()
         return super(CotizacionAdmin, self).queryset(request).filter(empresa__in=empresas)
 
+class MediosAdmin(admin.ModelAdmin):
+    exclude = ['empresa']
+    list_display = ['identificador','medio']
+    def save_model(self, request, obj, form, change):
+        obj.empresa = Empresa.objects.get(id=request.session.get('user_enterprise'))
+        obj.save()
+    def queryset(self, request):
+        empresa = request.user.empresa.all()
+        return super(MediosAdmin, self).queryset(request).filter(empresa__in=empresa)
+
 admin.site.register(Usuario, UsuarioAdmin)
 admin.site.register(Empresa,EmpresaAdmin)
 admin.site.register(Cliente,ClienteAdmin)
 admin.site.register(Moto, MotoAdmin)
+admin.site.register(Medio_Publicitario,MediosAdmin)
 admin.site.unregister(Site)
 admin.site.register(Kit,KitAdmin)
 admin.site.register(Inventario_motos, InventarioMotosAdmin)

@@ -4,7 +4,7 @@
 from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render, HttpResponse
 from django.template.loader import render_to_string
 from django.template.context import RequestContext
-from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion
+from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion,Medio_Publicitario
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -220,3 +220,7 @@ def is_vip(request,id_cli):
 def secondadmin(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/login/")
+
+def impacto_medios(request):
+    medios = Medio_Publicitario.objects.filter(empresa= request.session['enterprise'])
+    return render_to_response('cotizador/reportes_medios.html',{'medios':medios},context_instance=RequestContext(request))

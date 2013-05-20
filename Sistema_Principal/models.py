@@ -44,7 +44,7 @@ class UsuarioManager(BaseUserManager):
         )
         user.is_superuser = True
         user.es_admin = True
-        sicobotero = Empresa.objects.create(nombre="SiCoBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
+        sicobotero = Empresa.objects.create(nombre="SiBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
         sicobotero.save()
         user.empresa.add(sicobotero)
         user.save(using=self._db)
@@ -134,6 +134,9 @@ class Moto(models.Model):
         return self.nombre_fabr+" "+self.referencia+" "+self.modelo
     def __srt__(self):
         return self.nombre_fabr+" "+self.referencia+" "+self.modelo
+    def delete(self, using=None):
+        obj = Inventario_motos.objects.get(moto = self)
+        obj.en_venta = False
     class Meta:
         verbose_name="Moto"
         verbose_name_plural="Motos"
@@ -174,6 +177,15 @@ class T_financiacion(models.Model):
         verbose_name="Registro de Financiacion"
         verbose_name_plural = "Registros de Financiacion"
 
+class Medio_Publicitario(models.Model):
+    identificador = models.IntegerField(max_length=3)
+    medio = models.CharField(max_length="30",verbose_name="Medio Publicitario",null=False,blank=False)
+    empresa = models.ForeignKey(Empresa)
+    def __unicode__(self):
+        return "%s %s"%(self.identificador,self.medio)
+    class Meta:
+        verbose_name= "Medio Publicitario"
+        verbose_name_plural= "Medios Publicitarios"
 
 class Cotizacion(models.Model):
     fecha_cot = models.DateField(auto_now=True,verbose_name="Fecha de cotización")
@@ -186,6 +198,7 @@ class Cotizacion(models.Model):
     matricula_asociada = models.ManyToManyField(Matricula,null=False,verbose_name="Matricula Asociada")
     n_no_aplicables = models.IntegerField(max_length=2)
     empresa = models.ForeignKey(Empresa)
+    medio = models.ForeignKey(Medio_Publicitario)
     class Meta:
         verbose_name="Cotización"
         verbose_name_plural="Cotizaciones"
