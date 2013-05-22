@@ -2,12 +2,24 @@
 <head>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script>
-        $(document).ready(function(){
-            setTimeout(function(){
-                $("img").fadeIn(1000);
-            },5000)
-            self.close();
-        });
+
+    function sleep(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds){
+                break;
+            }
+        }
+    }
+
+        moto = window.opener.$("#id_moto").select2("val");
+        window.opener.console.log(moto);
+        window.opener.location.reload();
+        window.opener.$(document).ready(function(){
+            window.opener.$("#id_moto").select2("val",moto)
+        })
+
+
     </script>
 </head>
 <body>

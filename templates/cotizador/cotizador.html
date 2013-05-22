@@ -1,8 +1,13 @@
 {% extends "cotizador/base.html" %}
 {% load extratags %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/static/cotizacion/aside.css">
+{% endblock %}
 {% block scripts %}
+
 <script>
     $(document).ready(function (){
+        $("#id_cliente option[value='']").remove();
         $("#id_moto").select2();
         $("#id_cliente").select2();
         $("#id_no_aplicables").attr('disabled','disabled')
@@ -34,8 +39,6 @@
             $.post("/cotizacion/",this)
         });
 
-
-
         $("#id_cliente").change(function(event){
             value = $("#id_cliente").select2("val")
             if(value>=0){
@@ -50,6 +53,7 @@
                 })
             }
         });
+
     });
 </script>
 {% endblock %}
@@ -59,8 +63,8 @@
 <div id="cotizacion-datos">
 <form id="form_cot" method="POST">{% csrf_token %}
 <table>
-<tr><th><label for="id_moto">Moto:</label></th><td>{{ form.moto }}{{ form.moto.errors }}</td></tr>
 <tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}{{ form.cliente.errors }}<a id="openPop" href="#"><img id="add_cliente" src="/static/cotizacion/img/list-add.png" />Nuevo Cliente</a></td></tr>
+<tr><th><label for="id_moto">Moto:</label></th><td>{{ form.moto }}{{ form.moto.errors }}</td></tr>
 <tr><th><label for="id_medio">Medio publicitario:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
 <tr><th><label for="id_n_cuotas">N° de Cuotas:</label></th><td>{{ form.n_cuotas }}{{ form.n_cuotas.errors }}<br/>
     <span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span>
@@ -77,7 +81,28 @@
 {% endblock %}
 
 {% block sidebar %}
+    <div class="menu-item">
     {% if user.is_staff %}
-            <a id="cont-panel" href="{% url 'admin:index' %}"><img src="/static/cotizacion/img/display.png"/><br>Administración</a>
+      <h4><a href="#">Administracion</a></h4>
+      <ul>
+        <li><a id="cont-panel" href="{% url 'admin:index' %}"><img src="/static/cotizacion/img/display.png"/><br>Administración</a></li>
+      </ul>
+    </div>
+
+
+    <div class="menu-item">
+      <h4><a href="#">Reportes</a></h4>
+      <ul>
+        <li><a href="/reporte_medios/">Medios/Impacto</a></li>
+      </ul>
+    </div>
     {% endif %}
+
+    <div class="menu-item">
+      <h4><a href="#">Aplicaciones</a></h4>
+      <ul>
+        <li><a id="cot-panel" href="#"><img src="/static/cotizacion/img/wallet.png"/><br>Cotizacion</a></li>
+      </ul>
+    </div>
+
 {% endblock %}

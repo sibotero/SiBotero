@@ -58,7 +58,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     telefono = models.CharField(max_length=25)
     nombre = models.CharField(max_length=20,help_text=("Nombre del vendedor"))
     apellidos = models.CharField(max_length=40,help_text=("Apellidos del vendedor"))
-    empresa = models.ManyToManyField(Empresa,blank=True,null=True)
+    empresa = models.ManyToManyField(Empresa)
     esta_activo = models.BooleanField(default=True,verbose_name="¿Esta activo?")
     es_admin = models.BooleanField(default=False,verbose_name="¿Es administrador?")
     USERNAME_FIELD = 'username'
@@ -125,7 +125,7 @@ class Matricula(models.Model):
 
 class Moto(models.Model):
     nombre_fabr = models.CharField(max_length=15,help_text=("Fabricante de la moto"),null=False,verbose_name="Nombre Fabricante")
-    referencia = models.CharField(max_length=30,null=False,help_text=("Referencia de la moto"),unique=True)
+    referencia = models.CharField(max_length=30,null=False,help_text=("Referencia de la moto"))
     modelo = models.CharField(max_length=30,help_text=("Modelo de la moto"),null=False)
     precio_publico = models.IntegerField(max_length=14,null=False,verbose_name="Precio al Publico")
     cuota_minima = models.IntegerField(max_length=15,null=False,verbose_name="Cuota Minima")
@@ -140,6 +140,7 @@ class Moto(models.Model):
     class Meta:
         verbose_name="Moto"
         verbose_name_plural="Motos"
+        unique_together = ('modelo','referencia','empresa')
 
 class Kit(models.Model):
     soat = models.IntegerField(max_length=10, null=False,verbose_name="SOAT")
@@ -168,7 +169,7 @@ class Inventario_motos(models.Model):
 
     
 class T_financiacion(models.Model):
-    num_meses = models.IntegerField(max_length=2,null=False,unique=True,verbose_name="Meses")
+    num_meses = models.IntegerField(max_length=2,null=False,verbose_name="Meses")
     valor_por = models.FloatField(null=False,verbose_name="Valor Porcentual")
     empresa = models.ForeignKey(Empresa,null=False)
     def __unicode__(self):
@@ -176,6 +177,7 @@ class T_financiacion(models.Model):
     class Meta:
         verbose_name="Registro de Financiacion"
         verbose_name_plural = "Registros de Financiacion"
+        unique_together = ('num_meses','empresa')
 
 class Medio_Publicitario(models.Model):
     identificador = models.IntegerField(max_length=3)

@@ -71,6 +71,8 @@ STATIC_ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__),'../public
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
+ADMIN_MEDIA_PREFIX="/static/admin/"
+
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".

@@ -4,7 +4,7 @@
 from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render, HttpResponse
 from django.template.loader import render_to_string
 from django.template.context import RequestContext
-from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion,Medio_Publicitario
+from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion,Medio_Publicitario, Matricula
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -12,6 +12,7 @@ from Sistema_Principal.forms import AgregarCliente
 from Sistema_Principal.forms import CotizarForm
 from Sistema_Principal.html2pdf import converter as html2pdf
 from io import BytesIO
+from django import forms
 from django.core import mail
 from django.utils import simplejson
 from datetime import datetime
@@ -65,15 +66,29 @@ def cotizacion(request):
         return HttpResponseRedirect("/login/")
     usuario = request.user
     empresa = request.session['enterprise']
-    clientes = Cliente.objects.filter(empresa=empresa.id).order_by('-id')
-    motos = list(Moto.objects.filter(inventario_motos__en_venta=True))
-    tasas = T_financiacion.objects.filter(empresa=empresa.id)
+    clientes = Cliente.objects.all().filter(empresa=empresa).order_by('-id')
+    print clientes
+    motos = Moto.objects.filter(inventario_motos__en_venta=True).filter(empresa=empresa)
+    medios_pub = Medio_Publicitario.objects.filter(empresa=empresa)
+    tasas = T_financiacion.objects.filter(empresa=empresa)
+    matriculas = Matricula.objects.filter(empresa = empresa)
     if request.method == "GET":
         form = CotizarForm()
+        form.fields['cliente'].queryset = clientes
+        form.fields['moto'].queryset = motos
+        form.fields['n_cuotas'].queryset = tasas
+        form.fields['medio'].queryset = medios_pub
+        form.fields['matricula_asociada'].queryset = matriculas
         #print form.as_table()
         return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'motos':motos,'tasas':tasas,'form':form},context_instance= RequestContext(request))
     if request.method=="POST":
         form = CotizarForm(request.POST)
+        form.fields['cliente'].queryset = clientes
+        form.fields['moto'].queryset = motos
+        form.fields['n_cuotas'].queryset = tasas
+        form.fields['medio'].queryset = medios_pub
+        form.fields['matricula_asociada'].queryset = matriculas
+        form.fields['cliente'] = forms.ModelChoiceField(clientes,)
         if form.is_valid():
             add = form.save(commit=False)
             add.fecha_cot = datetime.today()
@@ -217,10 +232,19 @@ def is_vip(request,id_cli):
     #print json
     return HttpResponse(json,mimetype="application/json")
 
-def secondadmin(request):
-    if not request.user.is_authenticated():
+def impacto_medios(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        medios = Medio_Publicitario.objects.filter(empresa= request.session['enterprise'])
+        return render_to_response('cotizador/reportes_medios.html',{'medios':medios},context_instance=RequestContext(request))
+    else:
         return HttpResponseRedirect("/login/")
 
-def impacto_medios(request):
-    medios = Medio_Publicitario.objects.filter(empresa= request.session['enterprise'])
-    return render_to_response('cotizador/reportes_medios.html',{'medios':medios},context_instance=RequestContext(request))
+def get_last_cliente(request):
+    if request.user.is_authenticated:
+        empresa = request.session['enterprise']
+        clientes = list(Cliente.objects.filter(empresa = empresa).order_by("-id"))
+        cliente =  clientes[0]
+        json = "<option value='"+cliente.id+"'>"+cliente.nombre+" "+cliente.apellidos+" : "+cliente.cedula+"</option>"
+        return HttpResponse(json,mimetype="text/plain")
+    else:
+        HttpResponseRedirect("/login/")

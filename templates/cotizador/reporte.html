@@ -3,6 +3,7 @@
 {% block css%}
     <link href="/static/cotizacion/base.css" rel="stylesheet" type="text/css">
     <link href="/static/cotizacion/reporte.css" rel="stylesheet" type="text/css">
+    <link href="/static/cotizacion/aside.css" rel="stylesheet" type="text/css">
 {% endblock %}
 {% block scripts %}
 <script>
@@ -56,8 +57,27 @@
 </div>
 </div>
     <div id="options">
-<a href="/reportemail/{{ id_cot }}"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
-<a id="topdf" href="#"><img src="/static/cotizacion/img/acroread.png">Ver/Imprimir PDF</a>
-<a id="to_cotizador" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png">Volver a cotizacion</a>
+        <a href="/reportemail/{{ id_cot }}"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
+        <a id="topdf" href="#"><img src="/static/cotizacion/img/acroread.png">Ver/Imprimir PDF</a></li>
+        <a id="to_cotizador" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png">Cotizacion</a>
     </div>
+{% endblock %}
+
+{% block sidebar %}
+    <div class="menu-item">
+    {% if user.is_staff %}
+      <h4><a href="#">Administracion</a></h4>
+      <ul>
+        <li><a id="cont-panel" href="{% url 'admin:index' %}"><img src="/static/cotizacion/img/display.png"/><br>Administración</a></li>
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="menu-item">
+      <h4><a href="#">Reportes</a></h4>
+      <ul>
+        <li><a href="#">Medios/Impacto</a></li>
+      </ul>
+    </div>
+
 {% endblock %}

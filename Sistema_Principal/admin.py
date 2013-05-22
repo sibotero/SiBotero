@@ -101,14 +101,14 @@ class InventarioMotosAdmin(admin.ModelAdmin):
     list_filter = ('en_venta',)
     exclude = ['empresa']
     def queryset(self, request):
-        empresas = request.user.empresa.all()
-        return super(InventarioMotosAdmin, self).queryset(request).filter(empresa__in=empresas)
+        empresas = request.session.get('enterprise')
+        return super(InventarioMotosAdmin, self).queryset(request).filter(empresa=empresas)
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        empresas = request.user.empresa.all()
+        empresas = request.session['enterprise']
         if db_field.name == 'empresa':
             kwargs['queryset'] = empresas
         elif db_field.name == 'moto':
-            kwargs['queryset'] = Moto.objects.filter(empresa__in=empresas)
+            kwargs['queryset'] = Moto.objects.filter(empresa=empresas)
         return super(InventarioMotosAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs) 
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
@@ -189,8 +189,8 @@ class MatriculaAdmin(admin.ModelAdmin):
             kwargs['queryset'] = Matricula.objects.filter(empresa = empresa)
         return super(MatriculaAdmin,self).formfield_for_foreignkey(db_field,request,**kwargs)
     def queryset(self, request):
-        empresas = request.user.empresa.all()
-        return super(MatriculaAdmin, self).queryset(request).filter(empresa__in=empresas)
+        empresas = request.session.get('enterprise')
+        return super(MatriculaAdmin, self).queryset(request).filter(empresa=empresas)
 
 class T_financiacionAdmin(admin.ModelAdmin):
     list_display = ("num_meses",)
@@ -204,8 +204,8 @@ class T_financiacionAdmin(admin.ModelAdmin):
             kwargs['queryset'] = T_financiacion.objects.filter(empresa = empresa)
         return super(T_financiacionAdmin,self).formfield_for_foreignkey(db_field,request,kwargs)
     def queryset(self, request):
-        empresas = request.user.empresa.all()
-        return super(T_financiacionAdmin, self).queryset(request).filter(empresa__in=empresas)
+        empresas = request.session.get('enterprise')
+        return super(T_financiacionAdmin, self).queryset(request).filter(empresa=empresas)
 
 class EmpresaAdmin(admin.ModelAdmin):
     list_display = ("nombre","nit","ciudad","correo")
@@ -221,14 +221,16 @@ class EmpresaAdmin(admin.ModelAdmin):
 
 class CotizacionAdmin(admin.ModelAdmin):
     list_display = ("fecha_cot","cliente","moto")
+    readonly_fields = ('fecha_cot','moto','vendedor','no_aplicables','cliente','n_cuotas','cuota_inicial','matricula_asociada',
+    'n_no_aplicables','medio')
     exclude = ['empresa']
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         obj.fecha_cot = datetime.today()
         obj.save()
     def queryset(self, request):
-        empresas = request.user.empresa.all()
-        return super(CotizacionAdmin, self).queryset(request).filter(empresa__in=empresas)
+        empresas = request.session.get('enterprise')
+        return super(CotizacionAdmin, self).queryset(request).filter(empresa=empresas)
 
 class MediosAdmin(admin.ModelAdmin):
     exclude = ['empresa']
@@ -237,8 +239,8 @@ class MediosAdmin(admin.ModelAdmin):
         obj.empresa = Empresa.objects.get(id=request.session.get('user_enterprise'))
         obj.save()
     def queryset(self, request):
-        empresa = request.user.empresa.all()
-        return super(MediosAdmin, self).queryset(request).filter(empresa__in=empresa)
+        empresas = request.session.get('enterprise')
+        return super(MediosAdmin, self).queryset(request).filter(empresa=empresas)
 
 admin.site.register(Usuario, UsuarioAdmin)
 admin.site.register(Empresa,EmpresaAdmin)
