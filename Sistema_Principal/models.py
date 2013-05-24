@@ -153,22 +153,24 @@ class Kit(models.Model):
     placa = models.IntegerField(max_length=10,null=False)
     empresa = models.ForeignKey(Empresa,null=False)
     moto_asociada = models.ForeignKey(Moto,verbose_name="Moto Asociada")
+    valor_prenda = models.IntegerField(max_length=10)
     def __unicode__(self):
         return self.moto_asociada.nombre_fabr+" "+self.moto_asociada.referencia+" "+self.moto_asociada.modelo
     class Meta:
         verbose_name="Kit"
         verbose_name_plural="Kits"
+        unique_together=('empresa','moto_asociada')
 
 class Inventario_motos(models.Model):
     moto = models.ForeignKey(Moto,null=False,unique=True)
     en_venta = models.BooleanField(null=False,verbose_name="¿En venta?")
     empresa = models.ForeignKey('Empresa',null=False)
-    
     def __unicode__(self):
         #return u'{0} {1}'.format(self.moto, self.en_venta)
         return self.moto.nombre_fabr+" "+self.moto.referencia
     class Meta:
         verbose_name = verbose_name_plural = "Inventario de Motos"
+        unique_together=('empresa','moto')
 
     
 class T_financiacion(models.Model):
@@ -193,10 +195,11 @@ class Medio_Publicitario(models.Model):
         verbose_name_plural= "Medios Publicitarios"
 
 class Cotizacion(models.Model):
+    numeracion = models.IntegerField(max_length=100)
     fecha_cot = models.DateField(auto_now=True,verbose_name="Fecha de cotización")
     vendedor = models.ForeignKey(settings.AUTH_USER_MODEL)
-    no_aplicables = models.BooleanField()
     cliente = models.ForeignKey(Cliente)
+    no_aplicables = models.BooleanField()
     medio = models.ForeignKey(Medio_Publicitario)
     empresa = models.ForeignKey(Empresa)
     class Meta:

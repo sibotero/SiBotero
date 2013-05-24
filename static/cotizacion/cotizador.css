@@ -1,0 +1,48 @@
+form {
+    margin-top:30px;
+}
+
+#maestro{
+    width:70%;
+    margin-bottom:10px;
+}
+
+#maestro td,th{
+    padding-top:15px;
+}
+
+#id_no_aplicables{
+    margin-left:10px;
+}
+
+#add-cli{
+    margin-top:-10px;
+}
+
+#hijos{
+    width:100%;
+    margin-top:5px;
+}
+
+.button {
+background-image: -moz-linear-gradient(top, #ffffff, #dbdbdb);
+background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #dbdbdb));
+filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#dbdbdb');
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#dbdbdb')";
+border: 1px solid #fff;
+-moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+-webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
+text-decoration: none;
+text-shadow: #fff 0 1px 0;
+float: left;
+margin-top: 15px;
+margin-bottom: 15px;
+display: block;
+color: #597390;
+font-weight: bold;
+}
+
+.n_cuotas{
+    width:200px;
+}

@@ -1,0 +1,15 @@
+<tr><td><select id="id_moto_{{ numero_inline }}">
+    {% for moto in motos %}
+    <option value="{{ moto.id }}" class="moto">{{ moto.nombre_fab }} {{ moto.referencia }} {{ moto.modelo }}</option>
+    {% endfor %}
+</select></td>
+<td>
+    <input type="number" id="id_cuota_inicial_{{ numero_inline }}" />
+</td>
+<td>
+    <select id="id_n_cuotas_{{ numero_inline }}" class="n_cuotas" multiple>
+        {% for cuota in cuotas %}
+            <option value="{{ cuota.id }}">{{ cuota.num_meses }}</option>
+        {% endfor %}
+    </select>
+</td></tr>

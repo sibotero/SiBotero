@@ -245,8 +245,6 @@ table {
 
 td, th {
     font-size: 11px;
-    line-height: 13px;
-    border-bottom: 1px solid #eee;
     vertical-align: top;
     padding: 5px;
     font-family: "Lucida Grande", Verdana, Arial, sans-serif;
@@ -642,11 +640,6 @@ a.deletelink:hover {
     font-size: 10px;
     font-weight: bold;
     font-family: Arial,Helvetica,sans-serif;
-    padding-left: 0;
-    float: right;
-    position: relative;
-    margin-top: -2.4em;
-    margin-bottom: -2em;
 }
 
 .form-row .object-tools {
@@ -716,13 +709,12 @@ table#change-history tbody th {
 #container {
     position: relative;
     width: 100%;
-    min-width: 760px;
-    padding: 0;
 }
 
 #content {
+    padding-top: 15px;
     margin: 10px 15px;
-    width:88%;
+    width:79%;
     float:right;
 }
 
@@ -733,7 +725,7 @@ table#change-history tbody th {
 
 #content-main {
     float: left;
-    width: 100%;
+    width: 60%;
 }
 
 #content-related {
@@ -885,26 +877,6 @@ fieldset input,select{
 #s1, #s2{
     width:40%;
 
-}
-
-#cont-panel img{
-    margin-right:20px;
-}
-
-#add_cliente{
-    margin-top:-10px;
-}
-
-#popUp_cli{
-    visibility: hidden;
-}
-
-#cot-panel{
-    margin: 20px;
-}
-
-#cot-panel img {
-    margin-right:0px;
 }
 
 #sidebar{

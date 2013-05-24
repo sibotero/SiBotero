@@ -2,100 +2,106 @@
 {% load extratags %}
 {% block css %}
 <link rel="stylesheet" type="text/css" href="/static/cotizacion/aside.css">
+<link rel="stylesheet" type="text/css" href="/static/cotizacion/cotizador.css">
 {% endblock %}
 {% block scripts %}
-
 <script>
-    $(document).ready(function (){
-        $("#id_cliente option[value='']").remove();
-        $("#id_moto").select2();
-        $("#id_cliente").select2();
-        $("#id_no_aplicables").attr('disabled','disabled')
-
-        initial = $("#id_cliente").select2("val")
-        if(initial != 0){
-        $.get("/vip_cli/"+initial+"/",function(data){
-                    $("#id_no_aplicables").removeAttr("checked");
-                    if(data.vip){
-                        $("#id_no_aplicables").removeAttr('disabled')
-                    }else{
-                        $("#id_no_aplicables").attr('disabled','disabled')
-                    }
-
-                })
+    $(document).ready(function(){
+    $("#id_cliente").select2();
+    $("#id_medio").select2();
+    add_row();
+    $("#add_moto").click(function(event){
+        event.preventDefault();
+        add_row();
+    });
+    $("#cotizar").click(function(event){
+       event.preventDefault();
+       $("#cotizacion").submit();
+    });
+    function add_row(){
+        rows = $("#rows");
+        if(parseInt(rows.val())<8){
+        rows.val(parseInt(rows.val())+1);
+            $.get("/get_row/"+rows.val(),function(data){
+                $("#hijos").append(data);
+                $("#id_moto_"+rows.val()).select2();
+                $("#id_n_cuotas_"+rows.val()).select2();
+            });
+        }else{
+            alert("Maximo 8 motos por cotizacion")
         }
-        $("#openPop").click(function(){
-            window.open("/add_cliente/","_blank",'width=500,height=600');
-        });
-
-        $("#form_cot").submit(function(event){
-            $.post("/cotizacion/",this)
-        });
-
-        $("#id_cliente").change(function(event){
-            value = $("#id_cliente").select2("val")
-            if(value>=0){
-                val = $.get("/vip_cli/"+value+"/",function(data){
-                    $("#id_no_aplicables").removeAttr("checked");
-                    if(data.vip){
-                        $("#id_no_aplicables").removeAttr('disabled')
-                    }else{
-                        $("#id_no_aplicables").attr('disabled','disabled')
-                    }
-
-                })
-            }
-        });
-
+    };
     });
 </script>
 {% endblock %}
-
 {% block content-main %}
 <h1>Cotizacion</h1>
-<div id="cotizacion-datos">
-<form id="form_cot" method="POST">{% csrf_token %}
-<table>
-<tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}{{ form.cliente.errors }}<a id="openPop" href="#"><img id="add_cliente" src="/static/cotizacion/img/list-add.png" />Nuevo Cliente</a></td></tr>
-<tr><th><label for="id_moto">Moto:</label></th><td>{{ form.moto }}{{ form.moto.errors }}</td></tr>
-<tr><th><label for="id_medio">Medio publicitario:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
-<tr><th><label for="id_n_cuotas">N° de Cuotas:</label></th><td>{{ form.n_cuotas }}{{ form.n_cuotas.errors }}<br/>
-    <span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span>
-</td></tr>
-<tr><th><label for="id_cuota_inicial">Cuota Inicial:</label></th><td>{{ form.cuota_inicial }}{{ form.cuota_inicial.errors }}</td></tr>
-<tr><th><label for="id_matricula_asociada">Matricula Asociada:</label></th><td>{{ form.matricula_asociada }}{{ form.matricula_asociada.errors }}<br/><span class="helptext"> Mantenga presionado "Control", o "Command" en un Mac, para seleccionar más de una opción.</span></td></tr>
-<tr><th><label for="id_no_aplicables">Es VIP:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
-
+<form method="POST" action="/cotizacion/" id="cotizacion">{% csrf_token %}
+<table id="maestro">
+<tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}{{ form.cliente.errors }} <a href="#" id="add-cli"><img src="/static/cotizacion/img/list-add.png" /></a></td></tr>
+<tr><th><label for="id_no_aplicables">No aplicables:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
+<tr><th><label for="id_medio">Medio:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
 </table>
-
-    <input type="submit" value="Realizar" id="cotizar"/>
+    <a href="#" id="add_moto" class="button"> <span>Añadir Moto</span></a>
+<table id="hijos">
+    <thead>
+    <tr>
+    <td>
+        Moto
+    </td>
+    <td>
+        Cuota Inicial
+    </td>
+    <td>
+        No. de Cuotas
+    </td>
+    </tr>
+    </thead>
+</table>
+<input id="rows" type="hidden" value="0" />
+<a id="cotizar" href="#" class="button">Cotizar</a>
 </form>
-</div>
 {% endblock %}
 
 {% block sidebar %}
-    <div class="menu-item">
-    {% if user.is_staff %}
+    <div id="sidebar">
+        <div class="menu-item">
       <h4><a href="#">Administracion</a></h4>
       <ul>
-        <li><a id="cont-panel" href="{% url 'admin:index' %}"><img src="/static/cotizacion/img/display.png"/><br>Administración</a></li>
+                    <li><a href="/admin/Sistema_Principal/cliente/">Clientes</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/cotizacion/">Cotizaciones</a></li>
+                    {% if request.user.is_superuser %}
+                    <li><a href="/admin/Sistema_Principal/empresa/">Empresas</a></li>
+                    {% endif %}
+                    <li><a href="/admin/Sistema_Principal/inventario_motos/">Inventario de Motos</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/kit/">Kits</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/matricula/">Matriculas</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/medio_publicitario/">Medios Publicitarios</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/moto/">Motos</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/t_financiacion/">Registros de Financiacion</a></li>
+
+                    <li><a href="/admin/Sistema_Principal/usuario/">Usuarios</a></li>
       </ul>
     </div>
-
 
     <div class="menu-item">
       <h4><a href="#">Reportes</a></h4>
       <ul>
-        <li><a href="/reporte_medios/">Medios/Impacto</a></li>
+        <li><a href="#">History</a></li>
       </ul>
     </div>
-    {% endif %}
 
     <div class="menu-item">
       <h4><a href="#">Aplicaciones</a></h4>
-      <ul>
-        <li><a id="cot-panel" href="#"><img src="/static/cotizacion/img/wallet.png"/><br>Cotizacion</a></li>
-      </ul>
-    </div>
-
-{% endblock %}
+        <ul>
+            <li><a id="cot-panel" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png"/><br>Cotizacion</a></li>
+        </ul>
+      </div>
+        </div>
+{%endblock %}
