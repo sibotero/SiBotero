@@ -144,6 +144,11 @@ class MotoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         obj.save()
+        inv = Inventario_motos()
+        inv.en_venta=True
+        inv.moto = obj
+        inv.empresa = request.session.get('enterprise')
+        inv.save()
     def queryset(self, request):
         empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         return super(MotoAdmin,self).queryset(request).filter(empresa=empresa)
@@ -220,13 +225,14 @@ class EmpresaAdmin(admin.ModelAdmin):
         return perms
 
 class CotizacionAdmin(admin.ModelAdmin):
-    list_display = ("fecha_cot","cliente","moto")
-    readonly_fields = ('fecha_cot','moto','vendedor','no_aplicables','cliente','n_cuotas','cuota_inicial','matricula_asociada',
-    'n_no_aplicables','medio')
-    exclude = ['empresa']
+    list_display = ("fecha_cot","cliente")
+    #readonly_fields = ('fecha_cot','moto','vendedor','no_aplicables','cliente','n_cuotas','cuota_inicial',
+    #'n_no_aplicables','medio')
+    exclude = ['empresa','matricula_asociada']
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         obj.fecha_cot = datetime.today()
+        obj.matricula_asociada = Matricula.objects.filter(empresa = obj.empresa).get(nombre_ciudad=request.user.ciudad)
         obj.save()
     def queryset(self, request):
         empresas = request.session.get('enterprise')

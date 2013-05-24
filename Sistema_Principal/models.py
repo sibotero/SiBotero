@@ -47,6 +47,7 @@ class UsuarioManager(BaseUserManager):
         sicobotero = Empresa.objects.create(nombre="SiBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
         sicobotero.save()
         user.empresa.add(sicobotero)
+        user.ciudad = "Cartagena"
         user.save(using=self._db)
         return user
     def get_by_natural_key(self,username):
@@ -61,6 +62,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     empresa = models.ManyToManyField(Empresa)
     esta_activo = models.BooleanField(default=True,verbose_name="¿Esta activo?")
     es_admin = models.BooleanField(default=False,verbose_name="¿Es administrador?")
+    ciudad = models.CharField(max_length=24,verbose_name="Ciudad Establecida")
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
     objets = UsuarioManager()
@@ -120,8 +122,9 @@ class Matricula(models.Model):
     def __unicode__(self):
         return self.nombre_ciudad
     class Meta:
-        verbose_name="Matricula"
-        verbose_name_plural="Matriculas"
+        verbose_name="Documento"
+        verbose_name_plural="Documentos"
+        unique_together=['nombre_ciudad','empresa']
 
 class Moto(models.Model):
     nombre_fabr = models.CharField(max_length=15,help_text=("Fabricante de la moto"),null=False,verbose_name="Nombre Fabricante")
@@ -191,16 +194,19 @@ class Medio_Publicitario(models.Model):
 
 class Cotizacion(models.Model):
     fecha_cot = models.DateField(auto_now=True,verbose_name="Fecha de cotización")
-    moto = models.ForeignKey(Moto)
     vendedor = models.ForeignKey(settings.AUTH_USER_MODEL)
     no_aplicables = models.BooleanField()
     cliente = models.ForeignKey(Cliente)
-    n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N de Cuotas")
-    cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
-    matricula_asociada = models.ManyToManyField(Matricula,null=False,verbose_name="Matricula Asociada")
-    n_no_aplicables = models.IntegerField(max_length=2)
-    empresa = models.ForeignKey(Empresa)
     medio = models.ForeignKey(Medio_Publicitario)
+    empresa = models.ForeignKey(Empresa)
     class Meta:
         verbose_name="Cotización"
         verbose_name_plural="Cotizaciones"
+
+class CotizacionFila(models.Model):
+    cotizacion = models.ForeignKey(Cotizacion)
+    moto = models.ManyToManyField(Moto)
+    n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N de Cuotas")
+    cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
+    matricula_asociada = models.ForeignKey(Matricula)
+    n_no_aplicables = models.IntegerField(max_length=2)

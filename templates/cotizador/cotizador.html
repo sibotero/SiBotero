@@ -11,14 +11,7 @@
         $("#id_moto").select2();
         $("#id_cliente").select2();
         $("#id_no_aplicables").attr('disabled','disabled')
-        $("#pop").dialog({autoOpen:false,
-            title:"Agregar Cliente",
-            resizable:false,
-            position: { my: "center", at: "top", of: window },
-            close:function(event,ui){
-                location.reload();
-            },width:600
-        });
+
         initial = $("#id_cliente").select2("val")
         if(initial != 0){
         $.get("/vip_cli/"+initial+"/",function(data){

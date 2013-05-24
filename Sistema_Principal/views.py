@@ -190,41 +190,48 @@ def pdf_a_mail(request,id_cot):
     pass
 
 def get_dic_to_report(request,id_cot):
-    cot = Cotizacion.objects.get(id=id_cot)
-    moto = cot.moto.precio_publico
-    moto_obj = Moto.objects.get(pk = cot.moto.id)
-    kit = cot.moto.kit_set.all()[0]
-    kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
-    n_cuotas = cot.n_cuotas.all()[0:]
-    m_asociadas = cot.matricula_asociada.all()[0:]
-    c_ini = cot.cuota_inicial
-    sin_mat = moto + kit_total
-    l_con_mat = []
-    for i,mat in enumerate(m_asociadas):
-        #print i
-        l_con_mat.append( (sin_mat+mat.precio) - c_ini )
-    #print l_con_mat
-    l_preciot_cuotas = []
 
-    for i,el in enumerate(l_con_mat):
-        l_preciot_cuotas.append([])
-        for j,fin in enumerate(n_cuotas):
-            if cot.no_aplicables:
-                l_preciot_cuotas[i].append(int(el/fin.num_meses))
-            else:
-                if fin.valor_por != 0:
-                    l_preciot_cuotas[i].append(int(el*fin.valor_por))
-                else:
-                    l_preciot_cuotas[i].append(int(el/fin.num_meses))
+    cot = Cotizacion.objects.get(id=id_cot)
+    motos = list(cot.moto.all())
+    mat = Matricula.objects.get(nombre_ciudad=request.user.ciudad,empresa=request.session.get('enterprise'))
+    print motos
+    print mat
+
+    # cot = Cotizacion.objects.get(id=id_cot)
+    # moto = cot.moto.precio_publico
+    # moto_obj = Moto.objects.get(pk = cot.moto.id)
+    # kit = cot.moto.kit_set.all()[0]
+    # kit_total = kit.casco + kit.chaleco + kit.placa + kit.soat + kit.transporte
+    # n_cuotas = cot.n_cuotas.all()[0:]
+    # m_asociadas = cot.matricula_asociada.all()[0:]
+    # c_ini = cot.cuota_inicial
+    # sin_mat = moto + kit_total
+    # l_con_mat = []
+    # for i,mat in enumerate(m_asociadas):
+    #     #print i
+    #     l_con_mat.append( (sin_mat+mat.precio) - c_ini )
+    # #print l_con_mat
+    # l_preciot_cuotas = []
+    #
+    # for i,el in enumerate(l_con_mat):
+    #     l_preciot_cuotas.append([])
+    #     for j,fin in enumerate(n_cuotas):
+    #         if cot.no_aplicables:
+    #             l_preciot_cuotas[i].append(int(el/fin.num_meses))
+    #         else:
+    #             if fin.valor_por != 0:
+    #                 l_preciot_cuotas[i].append(int(el*fin.valor_por))
+    #             else:
+    #                 l_preciot_cuotas[i].append(int(el/fin.num_meses))
 
     #print l_preciot_cuotas
 
-    return{
-        'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
-        'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
-        'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas,'request':request,'id_cot':id_cot,
-        'user':request.user
-    }
+    #return{
+    #    'cot':cot, 'precio_moto':moto, 'objmoto':moto_obj,'kit':kit,'precio_kit':kit_total,
+    #    'n_cuotas':n_cuotas,'m_asociadas':m_asociadas,'cuota_inicial':c_ini,'precio_con_kit':sin_mat,
+    #    'precio_con_matriculas':l_con_mat,'lista_total_cotizada':l_preciot_cuotas,'request':request,'id_cot':id_cot,
+    #    'user':request.user
+    #}
 
 def is_vip(request,id_cli):
     to_json = {'vip':Cliente.objects.get(id=id_cli).es_vip,}
@@ -239,12 +246,3 @@ def impacto_medios(request):
     else:
         return HttpResponseRedirect("/login/")
 
-def get_last_cliente(request):
-    if request.user.is_authenticated:
-        empresa = request.session['enterprise']
-        clientes = list(Cliente.objects.filter(empresa = empresa).order_by("-id"))
-        cliente =  clientes[0]
-        json = "<option value='"+cliente.id+"'>"+cliente.nombre+" "+cliente.apellidos+" : "+cliente.cedula+"</option>"
-        return HttpResponse(json,mimetype="text/plain")
-    else:
-        HttpResponseRedirect("/login/")
