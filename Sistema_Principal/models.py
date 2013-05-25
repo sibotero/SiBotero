@@ -156,6 +156,11 @@ class Kit(models.Model):
     valor_prenda = models.IntegerField(max_length=10)
     def __unicode__(self):
         return self.moto_asociada.nombre_fabr+" "+self.moto_asociada.referencia+" "+self.moto_asociada.modelo
+    def totalkit(self,conprenda=False):
+        total = self.soat+self.casco+self.chaleco+self.transporte+self.placa
+        if conprenda:
+            total+=self.valor_prenda
+        return total
     class Meta:
         verbose_name="Kit"
         verbose_name_plural="Kits"

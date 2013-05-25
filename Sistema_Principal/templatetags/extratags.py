@@ -17,13 +17,23 @@ def get_count(value):
     conteo = qset.count()
     return conteo
 
-def get_apps(value):
-    apps = [app for app in SiCoBotero.settings.INSTALLED_APPS if not "django" in app]
-    print apps
-    return apps
+def is_in(value,args):
+    for val in value:
+        print type(val),type(args)
+        if val == args:
+            print "true"
+            return True
+    return False
+
+def empty(value):
+    if (len(value)==0 | value==None):
+        return True
+    return False
 
 register.filter('get_count',get_count)
 register.filter('concat',concat)
 register.filter('lookup',lookup)
 register.filter('len',get_length)
-register.filter('get_apps',get_apps)
+register.filter('is_in',is_in)
+register.filter('empty',empty)
+

@@ -1,15 +1,23 @@
-<tr><td><select id="id_moto_{{ numero_inline }}" name="moto_{{ numero_inline }}">
+{% load extratags %}
+<tr><td><select id="id_moto_{{ numero_inline }}" name="moto_{{ numero_inline }}" class="select2menu">
     {% for moto in motos %}
-    <option value="{{ moto.id }}" class="moto" {% if moto.referencia == nombresel %}selected{% endif %}>{{ moto.nombre_fab }} {{ moto.referencia }} {{ moto.modelo }}</option>
+    <option value="{{ moto.id }}" class="moto" {% if moto.id == motosel.id %}selected="selected"{% endif %}>{{ moto.nombre_fab }} {{ moto.referencia }} {{ moto.modelo }}</option>
     {% endfor %}
 </select></td>
 <td>
-    <input type="number" id="id_cuota_inicial_{{ numero_inline }}" name="cuota_inicial_{{ numero_inline }}" value="{{ valor }}"/>
+    <input type="number" id="id_cuota_inicial_{{ numero_inline }}" name="cuota_inicial_{{ numero_inline }}" value="{{ cinicial }}"/>
 </td>
 <td>
-    <select id="id_n_cuotas_{{ numero_inline }}" class="n_cuotas" name="n_cuotas_{{ numero_inline }}" multiple>
+    <select id="id_n_cuotas_{{ numero_inline }}" class="n_cuotas select2mult" name="n_cuotas_{{ numero_inline }}" multiple>
         {% for cuota in cuotas %}
-            <option value="{{ cuota.id }}" {% if n.selected %}selected{% endif %}>{{ cuota.num_meses }}</option>
+            <option value="{{ cuota.id }}">{{ cuota.num_meses }}</option>
         {% endfor %}
     </select>
 </td></tr>
+<script>
+    $(document).ready(function(){
+        {% for cuota in sncuotas %}
+        $("#id_n_cuotas_{{ numero_inline }} ").select2("val",'{{ cuota }}');
+        {% endfor %}
+    })
+</script>

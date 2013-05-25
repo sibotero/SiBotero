@@ -1,7 +1,7 @@
 #sidebar {
   font-family: Helvetica, Arial, "Lucida Grande", sans-serif;
   line-height: 1.5;/*for display only*/
-  width: 33%;
+  width: 15%;
   min-height:500px;
 
 }
@@ -36,7 +36,7 @@
 
 /*First Item Styles*/
 .alpha p {
-    font-size: 13px;
+    font-size: 15px;
     padding: 8px 12px;
     color: #aaa;
 }
@@ -57,6 +57,7 @@
   color: #aaa;
   display: block;
   width: 200px;
+  font-size: 1.4em;
 }
 
 /*li Styles*/

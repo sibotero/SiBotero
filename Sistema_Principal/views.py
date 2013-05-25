@@ -4,7 +4,7 @@
 from django.shortcuts import render_to_response, redirect, HttpResponseRedirect, render, HttpResponse
 from django.template.loader import render_to_string
 from django.template.context import RequestContext
-from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion,Medio_Publicitario, Matricula,CotizacionFila
+from Sistema_Principal.models import Empresa,Cliente,Moto, T_financiacion,Cotizacion,Medio_Publicitario, Matricula,CotizacionFila,Kit
 from Sistema_Principal.forms import CotizacionMaestro
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -75,7 +75,7 @@ def cotizacion(request):
             medios = Medio_Publicitario.objects.filter(empresa=empresa)
             form['cliente'].queryset = clientes
             form['medio'].queryset = medios
-            return render_to_response("cotizador/cotizador.html",{'clientes':clientes,'form':form},context_instance=RequestContext(request))
+            return render_to_response("cotizador/cotizador.html",{'form':form,'inline':0},context_instance=RequestContext(request))
         if request.method == "POST":
             empresa = request.session['enterprise']
             form = CotizacionMaestro(request.POST)
@@ -86,11 +86,28 @@ def cotizacion(request):
                     moto = Moto.objects.get(id= int(request.POST['moto_'+str(i+1)]))
                     cuota_inicial =  int(request.POST['cuota_inicial_'+str(i+1)])
                     n_cuotas = request.POST.getlist('n_cuotas_'+str(i+1))
+                    kit = Kit.objects.filter(empresa=empresa).get(moto_asociada=moto)
                     if moto.cuota_minima > cuota_inicial:
                         errors.append("La cuota de la moto "+moto.referencia+" "+moto.modelo+" debe ser mayor a "+str(moto.cuota_minima))
-                if(len(errors)>1):
+                    if len(n_cuotas)<1:
+                        errors.append("Debe elegir por lo menos 1 numero de cuotas para la moto "+moto.referencia+" "+moto.modelo)
+                    if cuota_inicial > (moto.precio_publico + kit.totalkit()):
+                        errors.append("La cuota inicial sobrepasa el valor a pagar para la moto "+moto.referencia+" "+moto.modelo)
+                if(len(errors)>=1):
                     #generar el html con los errores y los valores seleccionados
-                    pass
+                    form = CotizacionMaestro(request.POST)
+                    table = ""
+                    clientes = Cliente.objects.filter(empresa=empresa)
+                    for i in range(n_childs):
+                        motosel = Moto.objects.get(id= int(request.POST['moto_'+str(i+1)]))
+                        cuota_inicial =  int(request.POST['cuota_inicial_'+str(i+1)])
+                        sn_cuotas = request.POST.getlist('n_cuotas_'+str(i+1))
+                        print sn_cuotas
+                        empresa = request.session['enterprise']
+                        motos = Moto.objects.filter(empresa=empresa).filter(inventario_motos__en_venta=True)
+                        n_cuotas = T_financiacion.objects.filter(empresa=empresa)
+                        table += render_to_string("cotizador/inline_fila_cotizacion.html",{'numero_inline':(i+1),'motos':motos,'cuotas':n_cuotas,'cinicial':cuota_inicial,'motosel':motosel,'sncuotas':sn_cuotas,'is_inerror':True})
+                    return render_to_response("cotizador/cotizador.html",{'form':form,'inline':n_childs,'contenttable':table,'errors':errors,'is_inerror':True},context_instance=RequestContext(request))
                 else:
                     cot_maestra = form.save(commit=False)
                     cot_maestra.numeracion = Cotizacion.objects.filter(empresa=empresa).count()+1
@@ -115,9 +132,21 @@ def cotizacion(request):
                             reg = T_financiacion.objects.get(empresa=empresa,num_meses=lista[i])
                             cot.n_cuotas.add(reg)
                         cot.save()
-
                     return HttpResponseRedirect("/reporte/")
-                pass
+            else:
+                form = CotizacionMaestro(request.POST)
+                table = ""
+                clientes = Cliente.objects.filter(empresa=empresa)
+                n_childs =int(request.POST['rows'])
+                for i in range(n_childs):
+                    motosel = Moto.objects.get(id= int(request.POST['moto_'+str(i+1)]))
+                    cuota_inicial =  int(request.POST['cuota_inicial_'+str(i+1)])
+                    sn_cuotas = request.POST.getlist('n_cuotas_'+str(i+1))
+                    empresa = request.session['enterprise']
+                    motos = Moto.objects.filter(empresa=empresa).filter(inventario_motos__en_venta=True)
+                    n_cuotas = T_financiacion.objects.filter(empresa=empresa)
+                    table += render_to_string("cotizador/inline_fila_cotizacion.html",{'numero_inline':(i+1),'motos':motos,'cuotas':n_cuotas,'cinicial':cuota_inicial,'motosel':motosel,'cselec':sn_cuotas,'is_inerror':True})
+                return render_to_response("cotizador/cotizador.html",{'form':form,'inline':n_childs,'contenttable':table,'errors':[]},context_instance=RequestContext(request))
 
     else:
         return HttpResponseRedirect("/login/")
@@ -127,4 +156,4 @@ def get_row(request,n_inline):
             empresa = request.session['enterprise']
             motos = Moto.objects.filter(empresa=empresa).filter(inventario_motos__en_venta=True)
             n_cuotas = T_financiacion.objects.filter(empresa=empresa)
-            return render_to_response("cotizador/inline_fila_cotizacion.html",{'numero_inline':n_inline,'motos':motos,'cuotas':n_cuotas})
+            return render_to_response("cotizador/inline_fila_cotizacion.html",{'numero_inline':n_inline,'motos':motos,'cuotas':n_cuotas,'cinicial':0,'is_inerror':False})

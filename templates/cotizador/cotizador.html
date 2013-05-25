@@ -10,7 +10,9 @@
     $(document).ready(function(){
     $("#id_cliente").select2();
     $("#id_medio").select2();
-    add_row();
+        {% if not is_inerror %}
+            add_row();
+        {% endif %}
     $("#add_moto").click(function(event){
         event.preventDefault();
         add_row();
@@ -19,6 +21,8 @@
        event.preventDefault();
        $("#cotizacion").submit();
     });
+    $(".select2menu").select2();
+    $(".select2mult").select2();
     function add_row(){
         rows = $("#rows");
         if(parseInt(rows.val())<8){
@@ -43,7 +47,8 @@
 <tr><th><label for="id_no_aplicables">No aplicables:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
 <tr><th><label for="id_medio">Medio:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
 </table>
-    <a href="#" id="add_moto" class="button"> <span>Añadir Moto</span></a>
+<a href="#" id="add_moto" class="button"> <span>Añadir Moto</span></a>
+
 <table id="hijos">
     <thead>
     <tr>
@@ -59,21 +64,29 @@
     </tr>
     </thead>
     <tbody>
+    {% autoescape off %}
+        {{ contenttable }}
+    {% endautoescape %}
     </tbody>
 </table>
-<input id="rows" type="hidden" value="0" name="rows"/>
+<ul class="errorlist">
+{% for error in errors %}
+    <li>{{ error }}</li>
+{% endfor %}
+</ul>
+<input id="rows" type="hidden" value="{{ inline }}" name="rows"/>
 <a id="cotizar" href="#" class="button">Cotizar</a>
 </form>
 {% endblock %}
 
 {% block sidebar %}
-    <div id="sidebar">
+
         <div class="menu-item">
-      <h4><a href="#">Administracion</a></h4>
-      <ul>
+        {% if request.user.is_staff %}
+        <h4><a href="#">Administracion</a></h4>
+        <ul>
                     <li><a href="/admin/Sistema_Principal/cliente/">Clientes</a></li>
 
-                    <li><a href="/admin/Sistema_Principal/cotizacion/">Cotizaciones</a></li>
                     {% if request.user.is_superuser %}
                     <li><a href="/admin/Sistema_Principal/empresa/">Empresas</a></li>
                     {% endif %}
@@ -99,12 +112,12 @@
         <li><a href="#">History</a></li>
       </ul>
     </div>
-
+    {% endif %}
     <div class="menu-item">
       <h4><a href="#">Aplicaciones</a></h4>
         <ul>
             <li><a id="cot-panel" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png"/><br>Cotizacion</a></li>
         </ul>
       </div>
-        </div>
+
 {%endblock %}

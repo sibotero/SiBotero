@@ -50,11 +50,6 @@
 <!-- Container -->
 <div id="container">
 
-    <!-- END Header -->
-    {% block breadcrumbs %}
-    {% endblock %}
-
-
     {% block messages %}
         {% if messages %}
         <ul class="messagelist">{% for message in messages %}
@@ -83,12 +78,12 @@
 
 {% if not is_popup %}
         <div id="sidebar">
+
         <div class="menu-item">
-      <h4><a href="#">Administracion</a></h4>
-      <ul>
+        <h4><a href="#">Administracion</a></h4>
+        <ul>
                     <li><a href="/admin/Sistema_Principal/cliente/">Clientes</a></li>
 
-                    <li><a href="/admin/Sistema_Principal/cotizacion/">Cotizaciones</a></li>
                     {% if request.user.is_superuser %}
                     <li><a href="/admin/Sistema_Principal/empresa/">Empresas</a></li>
                     {% endif %}
