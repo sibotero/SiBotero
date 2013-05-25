@@ -207,8 +207,8 @@ class Cotizacion(models.Model):
         verbose_name_plural="Cotizaciones"
 
 class CotizacionFila(models.Model):
-    cotizacion = models.ForeignKey(Cotizacion)
-    moto = models.ManyToManyField(Moto)
+    cotizacion = models.ForeignKey(Cotizacion,null=True)
+    moto = models.ForeignKey(Moto)
     n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N de Cuotas")
     cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
     matricula_asociada = models.ForeignKey(Matricula)

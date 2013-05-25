@@ -5,6 +5,7 @@
 <link rel="stylesheet" type="text/css" href="/static/cotizacion/cotizador.css">
 {% endblock %}
 {% block scripts %}
+<script src="/static/cotizacion/js/jquery.formset.min.js" type="text/javascript" ></script>
 <script>
     $(document).ready(function(){
     $("#id_cliente").select2();
@@ -57,8 +58,10 @@
     </td>
     </tr>
     </thead>
+    <tbody>
+    </tbody>
 </table>
-<input id="rows" type="hidden" value="0" />
+<input id="rows" type="hidden" value="0" name="rows"/>
 <a id="cotizar" href="#" class="button">Cotizar</a>
 </form>
 {% endblock %}

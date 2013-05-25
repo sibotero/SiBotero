@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django import forms
-from Sistema_Principal.models import Cotizacion,Moto,Empresa,Cliente,Medio_Publicitario
+from Sistema_Principal.models import Cotizacion,Moto,Empresa,Cliente,Medio_Publicitario,CotizacionFila
 
 class AgregarCliente(forms.Form):
     cedula = forms.IntegerField(help_text=("Cedula del Cliente"),required=True,widget=forms.TextInput(attrs={'class':'required'}))

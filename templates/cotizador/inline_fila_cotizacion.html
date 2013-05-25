@@ -1,15 +1,15 @@
-<tr><td><select id="id_moto_{{ numero_inline }}">
+<tr><td><select id="id_moto_{{ numero_inline }}" name="moto_{{ numero_inline }}">
     {% for moto in motos %}
-    <option value="{{ moto.id }}" class="moto">{{ moto.nombre_fab }} {{ moto.referencia }} {{ moto.modelo }}</option>
+    <option value="{{ moto.id }}" class="moto" {% if moto.referencia == nombresel %}selected{% endif %}>{{ moto.nombre_fab }} {{ moto.referencia }} {{ moto.modelo }}</option>
     {% endfor %}
 </select></td>
 <td>
-    <input type="number" id="id_cuota_inicial_{{ numero_inline }}" />
+    <input type="number" id="id_cuota_inicial_{{ numero_inline }}" name="cuota_inicial_{{ numero_inline }}" value="{{ valor }}"/>
 </td>
 <td>
-    <select id="id_n_cuotas_{{ numero_inline }}" class="n_cuotas" multiple>
+    <select id="id_n_cuotas_{{ numero_inline }}" class="n_cuotas" name="n_cuotas_{{ numero_inline }}" multiple>
         {% for cuota in cuotas %}
-            <option value="{{ cuota.id }}">{{ cuota.num_meses }}</option>
+            <option value="{{ cuota.id }}" {% if n.selected %}selected{% endif %}>{{ cuota.num_meses }}</option>
         {% endfor %}
     </select>
 </td></tr>
