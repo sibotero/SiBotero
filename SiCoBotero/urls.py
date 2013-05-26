@@ -1,7 +1,9 @@
 import django
 from django.conf.urls import patterns, include, url
 from django.conf import settings
+from Sistema_Principal import urls
 from Sistema_Principal.views import *
+import Sistema_Principal
 from django.views.generic import RedirectView
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -19,17 +21,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^$',RedirectView.as_view(url="login")),
     url(r'^admin/', include(admin.site.urls),name="admin"),
-    url(r'^login/',login,name = "login"),
-    url(r'^cotizacion/',cotizacion,name="cotizacion"),
-    url(r'^logout/',logout,name="logout"),
-    url(r'^get_row/(?P<n_inline>.*)/$',get_row,name="get_row"),
-    #url(r'^add_cliente/',add_cliente,name="add_cliente"),
-    #url(r'^reportar/(?P<id_cot>.*)/$',report_cot,name="reportar"),
-    #url(r'^reportarpdf/(?P<id_cot>.*)/$',report_cot_pdf,name="reportarpdf"),
-    #url(r'^reportemail/(?P<id_cot>.*)/$',pdf_a_mail,name="reportemail"),
-    #url(r'^vip_cli/(?P<id_cli>.*)/$',is_vip,name="isvip"),
-    #url(r'^thanks/',gracias,name="gracias"),
-    #url(r'^reporte_medios/',impacto_medios,name="impactomedios"),
+    url(r'^',include(Sistema_Principal.urls),name="cotizador"),
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),
 )
 

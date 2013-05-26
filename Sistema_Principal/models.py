@@ -207,6 +207,8 @@ class Cotizacion(models.Model):
     no_aplicables = models.BooleanField()
     medio = models.ForeignKey(Medio_Publicitario)
     empresa = models.ForeignKey(Empresa)
+    def __unicode__(self):
+        return "%s %s %s"%(self.numeracion,self.fecha_cot,self.cliente)
     class Meta:
         verbose_name="Cotización"
         verbose_name_plural="Cotizaciones"
@@ -217,4 +219,7 @@ class CotizacionFila(models.Model):
     n_cuotas = models.ManyToManyField(T_financiacion,verbose_name="N de Cuotas")
     cuota_inicial = models.IntegerField(verbose_name="Cuota Inicial")
     matricula_asociada = models.ForeignKey(Matricula)
+    tipo = models.CharField(max_length=15,null=False)
     n_no_aplicables = models.IntegerField(max_length=2)
+    def __unicode__(self):
+        return "%s %s %s "%(self.cotizacion,self.moto,self.tipo)

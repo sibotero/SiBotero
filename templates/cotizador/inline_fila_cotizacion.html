@@ -5,7 +5,7 @@
     {% endfor %}
 </select></td>
 <td>
-    <input type="number" id="id_cuota_inicial_{{ numero_inline }}" name="cuota_inicial_{{ numero_inline }}" value="{{ cinicial }}"/>
+    <input type="text" class="input" id="id_cuota_inicial_{{ numero_inline }}" name="cuota_inicial_{{ numero_inline }}" value="{{ cinicial }}"/>
 </td>
 <td>
     <select id="id_n_cuotas_{{ numero_inline }}" class="n_cuotas select2mult" name="n_cuotas_{{ numero_inline }}" multiple>
@@ -13,9 +13,27 @@
             <option value="{{ cuota.id }}">{{ cuota.num_meses }}</option>
         {% endfor %}
     </select>
-</td></tr>
+</td>
+<td>
+    <select id="id_tipo_{{ numero_inline }}"  name="id_tipo_{{ numero_inline }}">
+        <option value="1">Credito</option>
+        <option value="2">Contado</option>
+    </select>
+</td>
+</tr>
 <script>
     $(document).ready(function(){
+        $("#id_tipo_{{ numero_inline }}").select2()
+                .on("change",function(evt){
+                    sel = $("#id_tipo_{{ numero_inline }}").select2("val")
+                    if(sel == 1){
+                        $("#id_n_cuotas_{{ numero_inline }}").select2("enable",true);
+                        $("#id_cuota_inicial_{{ numero_inline }}").attr("disabled",false);;
+                    }else if (sel == 2){
+                        $("#id_n_cuotas_{{ numero_inline }}").select2("enable",false);
+                        $("#id_cuota_inicial_{{ numero_inline }}").attr("disabled",true);
+                    }
+                })
         {% for cuota in sncuotas %}
         $("#id_n_cuotas_{{ numero_inline }} ").select2("val",'{{ cuota }}');
         {% endfor %}

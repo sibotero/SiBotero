@@ -8,6 +8,7 @@
 <script src="/static/cotizacion/js/jquery.formset.min.js" type="text/javascript" ></script>
 <script>
     $(document).ready(function(){
+    $("#id_cliente option[value='']").remove();
     $("#id_cliente").select2();
     $("#id_medio").select2();
         {% if not is_inerror %}
@@ -43,13 +44,13 @@
 <h1>Cotizacion</h1>
 <form method="POST" action="/cotizacion/" id="cotizacion">{% csrf_token %}
 <table id="maestro">
-<tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}{{ form.cliente.errors }} <a href="#" id="add-cli"><img src="/static/cotizacion/img/list-add.png" /></a></td></tr>
+<tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}<a href="/agregar_cliente/" target="_blank" onClick="window.open(this.href, this.target, 'width=500,height=600'); return false;"><img src="/static/cotizacion/img/list-add.png" /></a>{{ form.cliente.errors }}</td></tr>
 <tr><th><label for="id_no_aplicables">No aplicables:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
 <tr><th><label for="id_medio">Medio:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
 </table>
 <a href="#" id="add_moto" class="button"> <span>Añadir Moto</span></a>
 
-<table id="hijos">
+<table>
     <thead>
     <tr>
     <td>
@@ -61,13 +62,18 @@
     <td>
         No. de Cuotas
     </td>
+    <td>
+        Tipo de Cotizacion.
+    </td>
     </tr>
     </thead>
-    <tbody>
     {% autoescape off %}
+    <tbody id="hijos">
+
         {{ contenttable }}
-    {% endautoescape %}
+
     </tbody>
+    {% endautoescape %}
 </table>
 <ul class="errorlist">
 {% for error in errors %}

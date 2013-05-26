@@ -10,7 +10,7 @@
     $(document).ready(function(){
         $("#topdf").click(function(event){
             event.preventDefault()
-            window.open("/reportarpdf/{{ id_cot }}/","_blank",'width=800,height=600');
+            window.open("/reportarpdf/{{ cot.id }}/","_blank",'width=800,height=600');
         });
     });
 </script>
@@ -21,43 +21,24 @@
     {% if request.session.url_image != null %}
                 <img src="{{ request.session.url_image }} "  width='160px' height='110px'/>
     {% endif %}
-    <h1><span>Cotizacion Fecha :</span>{{ cot.fecha_cot }}</h1>
+    <h1><span>Cotizacion Fecha : </span>{{ cot.fecha_cot }}</h1>
 </div>
 <div id ="body_reporte">
+<h1>{{ request.session.enterprise.nombre }}</h1>
 <div id="left_side">
-<span>Moto : </span><h4>{{ objmoto.nombre_fab|add:" "|add:objmoto.referencia|add:" "|add:objmoto.modelo }} </h4>
-<span>Precio Publico : </span><h4>{{ objmoto.precio_publico }}</h4>
-<span>Precio Kit Total : </span><h4>{{ precio_kit }}</h4>
-<span>Cuota Inicial : </span><h4>{{ cuota_inicial }}</h4>
-{%  for mat in m_asociadas %}
-<span>Precio Matricula : </span><h4>{{ mat.nombre_ciudad }} : {{ mat.precio }}</h4>
-{% endfor %}
+<h2>Numeracion : {{ cot.numeracion }}</h2>
+<h2>Cliente : {{ cot.cliente.nombre }} {{ cot.cliente.apellidos }}</h2>
+<h2>Vendedor : {{ cot.vendedor.nombre }} {{ cot.vendedor.apellidos }}</h2>
+<h2>Medio : {{ cot.medio.identificador }} {{ cot.medio.medio }}</h2>
 </div>
 <div id="right_side">
-<table>
-<thead>
-<tr>
-    <td>Nombre Matricula</td>
-    {% for cot in n_cuotas %}
-        <td> {{ cot.num_meses }}</td>
-    {% endfor %}
-</tr>
-</thead>
-{% for i in lista_total_cotizada|len %}
-<tr>
-    <td>{{ m_asociadas|lookup:i }}</td>
-    {% for j in n_cuotas|len %}
-
-        <td>$ {{ lista_total_cotizada|lookup:i|lookup:j }}</td>
-
-    {% endfor %}
-</tr>
-{% endfor %}
-</table>
+{% autoescape off %}
+  {{ tablas }}
+{% endautoescape %}
 </div>
 </div>
     <div id="options">
-        <a href="/reportemail/{{ id_cot }}"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
+        <a href="/reportemail/{{ cot.id }}"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
         <a id="topdf" href="#"><img src="/static/cotizacion/img/acroread.png">Ver/Imprimir PDF</a></li>
         <a id="to_cotizador" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png">Cotizacion</a>
     </div>

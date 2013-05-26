@@ -879,3 +879,19 @@ fieldset input,select{
 
 }
 
+.input{
+margin-top:-7px;
+height:2.3em;
+padding: 0;
+position: relative;
+border: 1px solid #aaa;
+cursor: text;
+overflow: hidden;
+background-color: #fff;
+background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eeeeee), color-stop(15%, #ffffff));
+background-image: -webkit-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+background-image: -moz-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+background-image: -o-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+background-image: -ms-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+background-image: linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+}

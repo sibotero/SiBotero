@@ -47,13 +47,13 @@ class UserChangeForm(forms.ModelForm):
 
 fieldsets_admin = (
                   ("Info. General",{'fields':('username','email','password','empresa')}),
-                  ("Info. Personal",{'fields':('nombre','apellidos')}),
+                  ("Info. Personal",{'fields':('nombre','apellidos','ciudad')}),
                   ("¿Administrador?",{'fields':('es_admin','is_superuser')}),
                   ("Ultima entrada",{'fields':('last_login',)}),
                   )
 fieldsets_no_admin = (
                   ("Info. General",{'fields':('username','email','password',)}),
-                  ("Info. Personal",{'fields':('nombre','apellidos')}),
+                  ("Info. Personal",{'fields':('nombre','apellidos','ciudad')}),
                   ("¿Administrador?",{'fields':('es_admin',)}),
                   ("Ultima entrada",{'fields':('last_login',)}),
                   )
