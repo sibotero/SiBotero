@@ -10,7 +10,7 @@
     $(document).ready(function(){
         $("#topdf").click(function(event){
             event.preventDefault()
-            window.open("/reportarpdf/{{ cot.id }}/","_blank",'width=800,height=600');
+            window.open("/reportepdf/{{ cot.id }}/","_blank",'width=800,height=600');
         });
     });
 </script>
@@ -38,7 +38,7 @@
 </div>
 </div>
     <div id="options">
-        <a href="/reportemail/{{ cot.id }}"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
+        <a href="/pdfacorreo/{{ cot.id }}/"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
         <a id="topdf" href="#"><img src="/static/cotizacion/img/acroread.png">Ver/Imprimir PDF</a></li>
         <a id="to_cotizador" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png">Cotizacion</a>
     </div>

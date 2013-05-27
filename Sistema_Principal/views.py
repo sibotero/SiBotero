@@ -11,11 +11,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from Sistema_Principal.forms import AgregarCliente
 from datetime import date
-from Sistema_Principal.html2pdf import converter as html2pdf
-from io import BytesIO
-from django import forms
+from Sistema_Principal.html2pdf import converter
 from django.core import mail
-from django.forms.formsets import formset_factory
 
 
 def login(request):
@@ -134,6 +131,7 @@ def cotizacion(request):
                             n_no_aplicables = 0
                             matricula_asociada = Matricula.objects.filter(empresa=empresa,nombre_ciudad=request.user.ciudad)[0]
                             lista=request.POST.getlist('n_cuotas_'+str(i+1))
+			    print lista
                             cot = CotizacionFila()
                             cot.cotizacion = cot_maestra
                             cot.moto = moto
@@ -143,7 +141,8 @@ def cotizacion(request):
                             cot.tipo = "credito"
                             cot.save()
                             for i in range(len(lista)):
-                                reg = T_financiacion.objects.get(empresa=empresa,num_meses=lista[i])
+				print lista[i]
+                                reg = T_financiacion.objects.get(empresa=empresa,id=lista[i])
                                 cot.n_cuotas.add(reg)
                             cot.save()
                         else:
@@ -163,10 +162,11 @@ def cotizacion(request):
             else:
                 form = CotizacionMaestro(request.POST)
                 table = ""
+		empresa = request.session['enterprise']
                 clientes = Cliente.objects.filter(empresa=empresa)
                 medios = Medio_Publicitario.objects.filter(empresa = empresa)
-                form['cliente'].queryset = clientes
-                form['medio'].queryset = medios
+                form.fields['cliente'].queryset = clientes
+                form.fields['medio'].queryset = medios
                 n_childs =int(request.POST['rows'])
                 for i in range(n_childs):
                     motosel = Moto.objects.get(id= int(request.POST['moto_'+str(i+1)]))
@@ -239,8 +239,79 @@ def report(request,id_cot):
             tablas+="<td>"+str(cotrows_credito[i].n_cuotas.all()[j].num_meses)+" cuotas</td>"
         tablas+="</tr></thead><tbody><tr><td>%s %s</td>"%(moto.referencia,moto.modelo)
         for j in range(n_cuotas):
-            tablas+="<td>"+str((total_moto*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
+            tablas+="<td>"+str(((total_moto-cotrows_credito[i].cuota_inicial)*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
         tablas+="</tr></tbody></table>"
     print tablas
     return render_to_response("cotizador/reporte.html",{'tablas':tablas,'cot':cot},context_instance=RequestContext(request))
-    pass
+
+def reportpdf(request,id_cot):
+    cot = Cotizacion.objects.get(id = int(id_cot))
+    if cot != None:
+        empresa = request.session['enterprise']
+        cotrows = CotizacionFila.objects.filter(cotizacion = cot.id)
+        cotrows_cont = cotrows.filter(tipo="contado")
+        cotrows_credito = cotrows.filter(tipo="credito")
+        matricula = Matricula.objects.filter(empresa=empresa,nombre_ciudad=request.user.ciudad)[0]
+        tablas = "<table><thead><tr class='thead'><td>Moto</td>" \
+             "<td>Total Moto</td></tr></thead><tbody>"
+        for i in range(cotrows_cont.count()):
+            moto = cotrows_cont[i].moto
+            tablas+="<tr class='nothead'><td>"+moto.referencia+" "+moto.modelo+"</td>"
+            total_moto = moto.precio_publico+Kit.objects.filter(empresa=empresa).filter(moto_asociada=moto)[0].totalkit()+matricula.precio
+            tablas+="<td>"+str(total_moto)+"</td></tr>"
+        tablas+="</tbody></table>"
+        for i in range(cotrows_credito.count()):
+            n_cuotas = cotrows_credito[i].n_cuotas.count()
+            moto = cotrows_credito[i].moto
+            total_moto = moto.precio_publico+Kit.objects.filter(empresa=empresa).filter(moto_asociada=moto)[0].totalkit(conprenda=True)+matricula.precio
+            tablas += "<br><table><thead><tr class='thead'><td>Moto</td>"
+            for j in range(n_cuotas):
+                tablas+="<td>"+str(cotrows_credito[i].n_cuotas.all()[j].num_meses)+" cuotas</td>"
+            tablas+="</tr></thead><tbody class='nothead'><tr><td>%s %s</td>"%(moto.referencia,moto.modelo)
+            for j in range(n_cuotas):
+                tablas+="<td>"+str(((total_moto-cotrows_credito[i].cuota_inicial)*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
+            tablas+="</tr></tbody></table>"
+        print tablas
+        return converter.render_to_pdf("cotizador/pdf_report.html",{'content':tablas,'cot':cot})
+    else:
+        return HttpResponseRedirect("/cotizacion/")
+
+def pdfamail(request,id_cot):
+    cot = Cotizacion.objects.get(id=id_cot)
+    empresa = request.session['enterprise']
+    cotrows = CotizacionFila.objects.filter(cotizacion = cot.id)
+    cotrows_cont = cotrows.filter(tipo="contado")
+    cotrows_credito = cotrows.filter(tipo="credito")
+    matricula = Matricula.objects.filter(empresa=empresa,nombre_ciudad=request.user.ciudad)[0]
+    tablas = "<table><thead><tr class='thead'><td>Moto</td>" \
+        "<td>Total Moto</td></tr></thead><tbody>"
+    for i in range(cotrows_cont.count()):
+       moto = cotrows_cont[i].moto
+       tablas+="<tr class='nothead'><td>"+moto.referencia+" "+moto.modelo+"</td>"
+       total_moto = moto.precio_publico+Kit.objects.filter(empresa=empresa).filter(moto_asociada=moto)[0].totalkit()+matricula.precio
+       tablas+="<td>"+str(total_moto)+"</td></tr>"
+       tablas+="</tbody></table>"
+    for i in range(cotrows_credito.count()):
+       n_cuotas = cotrows_credito[i].n_cuotas.count()
+       moto = cotrows_credito[i].moto
+       total_moto = moto.precio_publico+Kit.objects.filter(empresa=empresa).filter(moto_asociada=moto)[0].totalkit(conprenda=True)+matricula.precio
+       tablas += "<br><table><thead><tr class='thead'><td>Moto</td>"
+       for j in range(n_cuotas):
+          tablas+="<td>"+str(cotrows_credito[i].n_cuotas.all()[j].num_meses)+" cuotas</td>"
+       tablas+="</tr></thead><tbody class='nothead'><tr><td>%s %s</td>"%(moto.referencia,moto.modelo)
+       for j in range(n_cuotas):
+          tablas+="<td>"+str(((total_moto-cotrows_credito[i].cuota_inicial)*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
+       tablas+="</tr></tbody></table>"
+    pdf = converter.render_to_pdf("cotizador/pdf_report.html",{'content':tablas,'cot':cot})
+    if pdf != None:
+        email = cot.cliente.email
+        empresa = request.session['enterprise']
+        subject = 'Cotizacion en '+empresa.nombre+' '+str(date.today())
+        body = unicode("\n"+"\n"+"Este mensaje fue autogenerado por el sistema. Por favor no contestar este mensaje\n"+ "Empresa : "+empresa.nombre+" Telefono: "+empresa.telefono+" Correo:"+empresa.correo+"\n"+"Direccion : "+empresa.direccion+"         \n"+"NIT: "+empresa.nit+"  Ciudad: "+empresa.ciudad+".")
+        efrom = "sicobotero@hotmail.com"
+        message = mail.EmailMessage(subject,body,efrom,to=[email,],headers = {'Reply-To': efrom})
+        message.attach("Reporte.pdf",pdf.content,mimetype="application/pdf")
+        message.send()
+        return HttpResponseRedirect('/reporte/'+str(id_cot)+"/")
+    else:
+        return HttpResponse(status=404)

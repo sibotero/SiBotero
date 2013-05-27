@@ -2,11 +2,16 @@
 {% load extratags %}
 <head>
    <style>
+    table{
+        padding-top:5px;
+        padding-left:5px;
+    }
     .thead{
         background-color:lightblue;
     }
 
     .nothead{
+        color: #000000;
         font-weight: lighter;
     }
 
@@ -22,8 +27,8 @@
     font-weight: bold;
     }
 
-    {
-    background-color:#003366;
+    table{
+    border:1px solid #003366;
     color:white;
     }
 
@@ -35,7 +40,11 @@
         <img src="{{ request.session.enterprise.imagen.path }}" width='160px' height='110px'/>
     {% endif %}
     <h1 class=".titulo">{{ request.session.enterprise.nombre }}</h1><br>
-    <span>Ciudad :</span> <h4>{{ request.session.enterprise.ciudad }}</h4>
+
+</div>
+<div id ="body_reporte">
+<div id="left_side">
+    <span>Ciudad :</span> <h4>{{ request.user.ciudad }}</h4>
     <span>Direccion :</span> <h4> {{ request.session.enterprise.direccion }}</h4>
     <span>Telefono :</span> <h4>{{ request.session.enterprise.telefono }}</h4>
     <span>Correo Electronico :</span> <h4>{{ request.session.enterprise.correo }}</h4><br>
@@ -43,53 +52,10 @@
     <br>
     <span>Cliente : {{ cot.cliente.nombre|concat:" "|concat:cot.cliente.apellidos }}</span>
     <span>C.C : {{ cot.cliente.cedula }}</span>
-</div>
-<div id ="body_reporte">
-<div id="left_side">
-<table>
-    <thead>
-    <tr>
-        <td class="thead">Moto</td>
-        <td class="thead">Precio Publico</td>
-        <td class="thead">Precio Kit Total</td>
-        <td class="thead">Cuota Inicial</td>
-        <td class="thead">Vendedor</td>
-    </tr>
-    </thead>
-    <tr>
-    <td class="nothead"><h4>{{ objmoto.nombre_fab|add:" "|add:objmoto.referencia|add:" "|add:objmoto.modelo }} </h4></td>
-    <td class="nothead"><h4>{{ objmoto.precio_publico }}</h4></td>
-    <td class="nothead"><h4>{{ precio_kit }}</h4></td>
-    <td class="nothead"><h4>{{ cuota_inicial }}</h4></td>
-    <td class="nothead"><h4>{{ user.nombre|concat:" "|concat:user.apellidos }}</h4></td>
-    </tr>
-</table>
-<span>Precio Matricula : </span>
-{%  for mat in m_asociadas %}
-<h4>{{ mat.nombre_ciudad }} : {{ mat.precio }}</h4>
-{% endfor %}
-</div>
 <div id="right_side">
-<table>
-<thead>
-<tr>
-    <td class="thead">Nombre Matricula</td>
-    {% for cot in n_cuotas %}
-        <td class="thead"> {{ cot.num_meses }}</td>
-    {% endfor %}
-</tr>
-</thead>
-{% for i in lista_total_cotizada|len %}
-<tr>
-    <td>{{ m_asociadas|lookup:i }}</td>
-    {% for j in n_cuotas|len %}
-
-        <td class="nothead">$ {{ lista_total_cotizada|lookup:i|lookup:j }}</td>
-
-    {% endfor %}
-</tr>
-{% endfor %}
-</table>
+{% autoescape off %}
+{{ content }}
+{% endautoescape %}
 </div>
 </div>
 </body>
