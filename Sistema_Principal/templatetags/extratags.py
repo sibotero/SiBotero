@@ -1,10 +1,11 @@
+# -*- encoding: utf-8 -*-
 from django import template
 from Sistema_Principal.models import Medio_Publicitario,Cotizacion
 import SiCoBotero.settings
 register = template.Library()
 
 def concat(value,args):
-    return str(value)+str(args)
+    return (str(value)+str(args)).encode('utf8')
 
 def lookup(value,key):
     return value[key]

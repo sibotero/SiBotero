@@ -71,7 +71,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural="Usuarios"
     def get_full_name(self):
         # The user is identified by their email address
-        return self.nombre+" "+self.apellidos
+        return u"%s %s"%(self.nombre.decode('utf8'),self.apellidos.decode('utf8'))
 
     def get_short_name(self):
         # The user is identified by their email address
@@ -116,7 +116,7 @@ class Cliente(models.Model):
 
 
 class Matricula(models.Model):
-    nombre_ciudad = models.CharField(max_length=20,null=False,unique=True)
+    nombre_ciudad = models.CharField(max_length=20,null=False)
     precio = models.IntegerField(max_length=20,null=False)
     empresa = models.ForeignKey(Empresa,null=False)
     def __unicode__(self):
@@ -124,7 +124,7 @@ class Matricula(models.Model):
     class Meta:
         verbose_name="Documento"
         verbose_name_plural="Documentos"
-        unique_together=['nombre_ciudad','empresa']
+        unique_together=('nombre_ciudad','empresa')
 
 class Moto(models.Model):
     nombre_fabr = models.CharField(max_length=15,help_text=("Fabricante de la moto"),null=False,verbose_name="Nombre Fabricante")

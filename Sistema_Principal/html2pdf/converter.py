@@ -3,7 +3,8 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template.context import Context
 from django.template.loader import get_template
-from xhtml2pdf import pisa # TODO: Change this when the lib changes.
+import xhtml2pdf # TODO: Change this when the lib changes.
+from xhtml2pdf import pisa
 import StringIO
 import os
 
@@ -42,7 +43,7 @@ def generate_pdf_template_object(template_object, file_object, context):
     Inner function to pass template objects directly instead of passing a filename
     """
     html = template_object.render(Context(context))
-    pisa.CreatePDF(html.encode("UTF-8"), file_object , encoding='UTF-8',
+    xhtml2pdf.pisa.CreatePDF(html.encode("UTF-8"), file_object , encoding='UTF-8',
                    link_callback=fetch_resources)
     return file_object
 
@@ -79,6 +80,22 @@ def render_to_pdf(template_src, context_dict,pdfname="report.pdf"):
    template = get_template(template_src)
    context = Context(context_dict)
    html = template.render(context)
+   result = StringIO.StringIO()
+
+   pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")),
+       dest=result,
+       encoding='UTF-8',
+   )
+   if not pdf.err:
+       response = HttpResponse(result.getvalue(),
+           mimetype='application/pdf')
+       return response
+
+   return HttpResponse('We had some errors<pre>%s</pre>' %escape(html))
+
+
+def render_to_pdf(html,pdfname="report.pdf"):
+   """Function to render html template into a pdf file"""
    result = StringIO.StringIO()
 
    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("UTF-8")),

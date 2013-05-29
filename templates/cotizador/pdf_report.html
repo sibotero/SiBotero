@@ -1,14 +1,13 @@
 <html>
 {% load extratags %}
 <head>
+   <meta charset="utf-8">
    <style>
-    table{
+    *{
         padding-top:5px;
         padding-left:5px;
     }
-    .thead{
-        background-color:lightblue;
-    }
+
 
     .nothead{
         color: #000000;
@@ -27,31 +26,89 @@
     font-weight: bold;
     }
 
-    table{
-    border:1px solid #003366;
-    color:white;
+
+
+    #Consecutivo{
+        text-align: right;
+        font-size:3em;
     }
 
+    .bottom{
+        height: 100px;
+        border: none;
+    }
+    .content{
+        color: black;
+        margin-right:5px;
+    }
+    .mini{
+        font-size: 0.9em;
+    }
+
+    .thead{
+        background-color:#003366;
+        border-top-left-radius: 10px;
+        color:white;
+    }
+
+    #right_side table{
+        width:100%;
+    }
    </style>
 </head>
 <body>
 <div>
-    {% if request.session.url_image != null %}
-        <img src="{{ request.session.enterprise.imagen.path }}" width='160px' height='110px'/>
-    {% endif %}
+
     <h1 class=".titulo">{{ request.session.enterprise.nombre }}</h1><br>
 
 </div>
 <div id ="body_reporte">
+<table class="bottom">
+    <tr>
+        <td width="10%">
+            {% if request.session.url_image != None %}
+            <img src="{{ request.session.enterprise.imagen.path }}" width='160px' height='110px'/>
+            {% endif %}
+        </td>
+        <td width="10%">
+
+        </td>
+        <td width="40%">
+            <table width="100%">
+                <tr style="color: black; margin-right:5px; font-size: 0.9em; "><td>Ciudad : </td><td>{{ request.user.ciudad }}</td></tr>
+                <tr class="content"><td>Direccion : </td><td>{{ request.session.enterprise.direccion }}</td></tr>
+                <tr class="content"><td>Telefono : </td><td>{{ request.session.enterprise.telefono }}</td></tr>
+                <tr class="content"><td>Telefono : </td><td>{{ request.session.enterprise.telefono }}</td></tr>
+                <tr class="content"><td>Correo Electronico:</td><td>{{ request.session.enterprise.correo }}</td></tr>
+            </table>
+        </td>
+        <td width="20%">
+                <table width="100%">
+                <tr class="thead"><td>Cotizacion</td></tr>
+                <tr class="content"><td>N° <div id="Consecutivo">{{ cot.numeracion }}</div> </td></tr>
+                <tr class="thead"><td>Fecha</td></tr>
+                <table width="100%">
+                    <tr class="thead"><td>DIA</td><td>MES</td><td>AÑO</td></tr>
+                    <tr class="content"><td>{{ cot.fecha_cot.day }}</td><td>{{  cot.fecha_cot.month }}</td><td>{{ cot.fecha_cot.year }}</td></tr>
+                </table>
+            </table>
+        </td>
+    </tr>
+    <tr></tr>
+    <tr></tr>
+</table>
+
 <div id="left_side">
-    <span>Ciudad :</span> <h4>{{ request.user.ciudad }}</h4>
-    <span>Direccion :</span> <h4> {{ request.session.enterprise.direccion }}</h4>
-    <span>Telefono :</span> <h4>{{ request.session.enterprise.telefono }}</h4>
-    <span>Correo Electronico :</span> <h4>{{ request.session.enterprise.correo }}</h4><br>
-    <span>Cotizacion Fecha :</span> <h4>{{ cot.fecha_cot }}</h4>
-    <br>
-    <span>Cliente : {{ cot.cliente.nombre|concat:" "|concat:cot.cliente.apellidos }}</span>
-    <span>C.C : {{ cot.cliente.cedula }}</span>
+    <table width="100%">
+        <tr>
+            <td width="60%"><span>Nombres y Apellidos : </span>{{ cot.cliente.nombre}} {{cot.cliente.apellidos }}</td>
+            <td width="40%"><span>Telefono : {{ cot.cliente.telefono }}</span></td>
+        </tr>
+        <tr>
+            <td width="60%"><span>Direccion : </span>{{ cot.cliente.direccion }}</td>
+            <td><span>Cedula : </span>{{ cot.cliente.cedula }}</td>
+        </tr>
+    </table>
 <div id="right_side">
 {% autoescape off %}
 {{ content }}

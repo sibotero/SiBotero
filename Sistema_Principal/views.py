@@ -11,6 +11,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from Sistema_Principal.forms import AgregarCliente
 from datetime import date
+from wkhtmltopdf.views import PDFTemplateResponse
 from Sistema_Principal.html2pdf import converter
 from django.core import mail
 
@@ -33,7 +34,6 @@ def login(request):
                 objemp = Empresa.objects.get(pk=empresa)
 
                 if objemp in empresasusr:
-                    print "aqui aqui"
                     try:
                         url_image = objemp.imagen.url
                     except:
@@ -42,7 +42,7 @@ def login(request):
                     request.session['user_enterprise'] = objemp.id
                     request.session['enterprise'] = objemp
                     auth_login(request, user)
-                    print "usuario logeado"
+
                     if user.es_admin:
                         #print "bienvenido administrador"
                         return redirect("/admin/",context_instance= RequestContext(request))
@@ -63,7 +63,6 @@ def logout(request):
     return redirect("/login/")
 
 def cotizacion(request):
-    print request.user
     if request.user.is_authenticated():
         if request.method == "GET":
             empresa = request.session['enterprise']
@@ -72,7 +71,7 @@ def cotizacion(request):
             medios = Medio_Publicitario.objects.filter(empresa=empresa)
             form.fields['cliente'].queryset = clientes
             form.fields['medio'].queryset = medios
-            print form.fields['cliente'].queryset
+
             return render_to_response("cotizador/cotizador.html",{'form':form,'inline':0},context_instance=RequestContext(request))
         if request.method == "POST":
             empresa = request.session['enterprise']
@@ -110,7 +109,7 @@ def cotizacion(request):
                         if tipo_n==1:
                             cuota_inicial =  int(request.POST['cuota_inicial_'+str(i+1)])
                             n_cuotas = request.POST.getlist('n_cuotas_'+str(i+1))
-                        print sn_cuotas
+
                         empresa = request.session['enterprise']
                         motos = Moto.objects.filter(empresa=empresa).filter(inventario_motos__en_venta=True)
                         n_cuotas = T_financiacion.objects.filter(empresa=empresa)
@@ -131,7 +130,6 @@ def cotizacion(request):
                             n_no_aplicables = 0
                             matricula_asociada = Matricula.objects.filter(empresa=empresa,nombre_ciudad=request.user.ciudad)[0]
                             lista=request.POST.getlist('n_cuotas_'+str(i+1))
-			    print lista
                             cot = CotizacionFila()
                             cot.cotizacion = cot_maestra
                             cot.moto = moto
@@ -141,7 +139,6 @@ def cotizacion(request):
                             cot.tipo = "credito"
                             cot.save()
                             for i in range(len(lista)):
-				print lista[i]
                                 reg = T_financiacion.objects.get(empresa=empresa,id=lista[i])
                                 cot.n_cuotas.add(reg)
                             cot.save()
@@ -241,7 +238,6 @@ def report(request,id_cot):
         for j in range(n_cuotas):
             tablas+="<td>"+str(((total_moto-cotrows_credito[i].cuota_inicial)*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
         tablas+="</tr></tbody></table>"
-    print tablas
     return render_to_response("cotizador/reporte.html",{'tablas':tablas,'cot':cot},context_instance=RequestContext(request))
 
 def reportpdf(request,id_cot):
@@ -271,8 +267,10 @@ def reportpdf(request,id_cot):
             for j in range(n_cuotas):
                 tablas+="<td>"+str(((total_moto-cotrows_credito[i].cuota_inicial)*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
             tablas+="</tr></tbody></table>"
-        print tablas
-        return converter.render_to_pdf("cotizador/pdf_report.html",{'content':tablas,'cot':cot})
+        #html = render_to_string("cotizador/pdf_report.html",{'content':tablas,'cot':cot})
+        return PDFTemplateResponse(request,"cotizador/pdf_report.html",{'content':tablas,'cot':cot})
+        #return converter.render_to_pdf(html=html)
+        #return HttpResponse(html)
     else:
         return HttpResponseRedirect("/cotizacion/")
 
@@ -302,7 +300,7 @@ def pdfamail(request,id_cot):
        for j in range(n_cuotas):
           tablas+="<td>"+str(((total_moto-cotrows_credito[i].cuota_inicial)*(1+cotrows_credito[i].n_cuotas.all()[j].valor_por)/cotrows_credito[i].n_cuotas.all()[j].num_meses))+"</td>"
        tablas+="</tr></tbody></table>"
-    pdf = converter.render_to_pdf("cotizador/pdf_report.html",{'content':tablas,'cot':cot})
+    pdf = PDFTemplateResponse(request,"cotizador/pdf_report.html",{'content':tablas,'cot':cot}).render()
     if pdf != None:
         email = cot.cliente.email
         empresa = request.session['enterprise']

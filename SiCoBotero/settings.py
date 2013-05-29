@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 # Django settings for SiCoBotero project.
 import os
 
@@ -131,6 +132,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'south',
     'Sistema_Principal',
+    'wkhtmltopdf',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -154,6 +156,12 @@ AUTH_USER_MODEL='Sistema_Principal.Usuario'
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGIN_URL = "/login/"
+
+WKHTMLTOPDF_CMD = "/usr/bin/wkhtmltopdf"
+
+WKHTMLTOPDF_CMD_OPTIONS = {
+    'quiet': True,
+}
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'sicobotero@gmail.com'
