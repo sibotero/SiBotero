@@ -11,5 +11,7 @@ urlpatterns = patterns('Sistema_Principal.views',
     url(r'^agregar_cliente/',add_cliente,name="agregar_cliente"),
     url(r'^reporte/(?P<id_cot>.*)/$',report,name="reporte"),
     url(r'^reportepdf/(?P<id_cot>.*)/$',reportpdf,name="reportepdf"),
-    url(r'^pdfacorreo/(?P<id_cot>.*)/$',pdfamail,name="reportepdf"),
+    url(r'^pdfacorreo/(?P<id_cot>.*)/$',pdfamail,name="reportepdfmail"),
+    url(r'^getimagen/(?P<id_moto>.*)/$',get_imagen_moto,name="imagen_moto"),
+    url(r'^historial_cotizaciones/$',get_cot_list,name="historial_cotizaciones"),
 )

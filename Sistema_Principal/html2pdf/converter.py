@@ -3,7 +3,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.template.context import Context
 from django.template.loader import get_template
-import xhtml2pdf # TODO: Change this when the lib changes.
+import xhtml2pdf
 from xhtml2pdf import pisa
 import StringIO
 import os

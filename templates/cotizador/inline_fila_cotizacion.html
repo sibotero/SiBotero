@@ -20,6 +20,15 @@
         <option value="2">Contado</option>
     </select>
 </td>
+<td>
+    <div id="prv_moto_{{ numero_inline }}">
+    {% if not is_inerror %}
+    <img src="{{ motos.0.imagen_preview.url }}" width="120px" />
+    {% else %}
+    <img src="{{ motosel.imagen_preview.url }}" width="120px" />
+    {% endif %}
+    </div>
+</td>
 </tr>
 <script>
     $(document).ready(function(){
@@ -34,8 +43,20 @@
                         $("#id_cuota_inicial_{{ numero_inline }}").attr("disabled",true);
                     }
                 })
-        {% for cuota in sncuotas %}
-        $("#id_n_cuotas_{{ numero_inline }} ").select2("val",'{{ cuota }}');
-        {% endfor %}
+        $("#id_n_cuotas_{{ numero_inline }}").select2()
+                .on("change",function(){
+                    vals = $("#id_n_cuotas_{{ numero_inline }}").select2("val")
+                    $("#id_n_cuotas_{{ numero_inline }}").select2("val","")
+                    $("#id_n_cuotas_{{ numero_inline }}").select2("val",vals)
+
+                })
+        $("#id_moto_{{ numero_inline }}").select2()
+                .on("change",function(){
+                    id_moto = $("#id_moto_{{ numero_inline }}").select2("val")
+                    $.get("/getimagen/"+id_moto+"/",function(data){
+                                $("#prv_moto_{{ numero_inline }}").html(data);
+                            });
+                });
+
     })
 </script>

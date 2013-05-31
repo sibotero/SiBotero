@@ -11,6 +11,7 @@
     $("#id_cliente option[value='']").remove();
     $("#id_cliente").select2();
     $("#id_medio").select2();
+    $("#id_requisitos").select2();
         {% if not is_inerror %}
             add_row();
         {% endif %}
@@ -47,6 +48,7 @@
 <tr><th><label for="id_cliente">Cliente:</label></th><td>{{ form.cliente }}<a href="/agregar_cliente/" target="_blank" onClick="window.open(this.href, this.target, 'width=500,height=600'); return false;"><img src="/static/cotizacion/img/list-add.png" /></a>{{ form.cliente.errors }}</td></tr>
 <tr><th><label for="id_no_aplicables">No aplicables:</label></th><td>{{ form.no_aplicables }}{{ form.no_aplicables.errors }}</td></tr>
 <tr><th><label for="id_medio">Medio:</label></th><td>{{ form.medio }}{{ form.medio.errors }}</td></tr>
+<tr><th><label for="id_requisitos">Requisitos: </label></th><td>{{ form.requisitos }}{{ form.requisitos.errors }}</td></tr>
 </table>
 <a href="#" id="add_moto" class="button"> <span>Añadir Moto</span></a>
 
@@ -108,6 +110,8 @@
 
                     <li><a href="/admin/Sistema_Principal/t_financiacion/">Registros de Financiacion</a></li>
 
+                    <li><a href="/admin/Sistema_Principal/requisitotabla/">Requisitos para Financiacion</a></li>
+
                     <li><a href="/admin/Sistema_Principal/usuario/">Usuarios</a></li>
       </ul>
     </div>
@@ -115,7 +119,7 @@
     <div class="menu-item">
       <h4><a href="#">Reportes</a></h4>
       <ul>
-        <li><a href="#">History</a></li>
+        <li><a href="/historial_cotizaciones/">Historial de Cotizaciones</a></li>
       </ul>
     </div>
     {% endif %}

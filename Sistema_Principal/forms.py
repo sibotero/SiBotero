@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django import forms
-from Sistema_Principal.models import Cotizacion,Moto,Empresa,Cliente,Medio_Publicitario,CotizacionFila
+from Sistema_Principal.models import Cotizacion,Moto,Empresa,Cliente,Medio_Publicitario,T_financiacion
 
 class AgregarCliente(forms.Form):
     cedula = forms.IntegerField(help_text=("Cedula del Cliente"),required=True,widget=forms.TextInput(attrs={'class':'required'}))
@@ -31,3 +31,32 @@ class CotizacionMaestro(forms.ModelForm):
             return value
         else:
             raise forms.ValidationError("¿Por que medio se entero el cliente?")
+
+class Add_t_financiacion_form(forms.ModelForm):
+    def cleanned_num_meses(self):
+        if self.cleane_data['num_meses'] == None:
+            raise forms.ValidationError("No puede dejar el numero de meses vacio")
+    def clean(self):
+        cleaned_data = super(Add_t_financiacion_form,self).clean()
+        val = cleaned_data['num_meses']
+        print cleaned_data
+        print self.instance
+        print self.instance.id
+        if self.instance.id is None:
+            t = T_financiacion.objects.filter(empresa=self.request.session['enterprise'],num_meses = val)
+            if(t.count() > 0):
+                raise forms.ValidationError("Ya existe un registro para ese numero de meses")
+            else:
+                return cleaned_data
+        else:
+            t = T_financiacion.objects.filter(empresa=self.request.session['enterprise'],num_meses = val).exclude(id=self.instance.id)
+            print t.count()
+            if(t.count()==0):
+                return cleaned_data
+            else:
+                raise forms.ValidationError("Ya existe un registro para ese numero de meses")
+    class Meta:
+        model=T_financiacion
+        exclude = ['empresa']
+
+

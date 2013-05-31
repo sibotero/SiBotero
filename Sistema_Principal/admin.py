@@ -12,8 +12,10 @@ from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from Sistema_Principal.models import Usuario, Empresa, Cliente, Moto, Kit, Inventario_motos,T_financiacion,Matricula, Cotizacion, Medio_Publicitario
+from Sistema_Principal.models import *
 from django.contrib.sites.models import Site
+from Sistema_Principal.forms import Add_t_financiacion_form
+from django.forms import ModelForm
 from datetime import datetime
 
 class UserCreationForm(forms.ModelForm):
@@ -66,7 +68,7 @@ class UsuarioAdmin(UserAdmin):
     list_filter = ('es_admin',)
     fieldsets = (
                   ("Info. General",{'fields':('username','email','password',)}),
-                  ("Info. Personal",{'fields':('nombre','apellidos')}),
+                  ("Info. Personal",{'fields':('nombre','apellidos','ciudad')}),
                   ("¿Administrador?",{'fields':('es_admin',)}),
                   ("Ultima entrada",{'fields':('last_login',)}),
                   )
@@ -77,10 +79,12 @@ class UsuarioAdmin(UserAdmin):
 
         if request.user.is_superuser:
             self.fieldsets = fieldsets_admin
+            form = self.get_form(request, obj)
         else:
             self.fieldsets = fieldsets_no_admin
+            form = self.get_form(request, obj)
 
-        form = self.get_form(request, obj)
+
         fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
 
         return [(None, {'fields': fields})]
@@ -144,11 +148,13 @@ class MotoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         obj.save()
-        inv = Inventario_motos()
-        inv.en_venta=True
-        inv.moto = obj
-        inv.empresa = request.session.get('enterprise')
-        inv.save()
+        invt = Inventario_motos.objects.filter(empresa=obj.empresa,moto=obj)
+        if(invt.count() == 0):
+            inv = Inventario_motos()
+            inv.en_venta=True
+            inv.moto = obj
+            inv.empresa = request.session.get('enterprise')
+            inv.save()
     def queryset(self, request):
         empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         return super(MotoAdmin,self).queryset(request).filter(empresa=empresa)
@@ -174,13 +180,32 @@ class ClienteAdmin(admin.ModelAdmin):
     list_display = ("nombre","apellidos","cedula","telefono","direccion","email")
     search_fields = ("nombre","cedula","email")
     exclude = ['empresa']
+    actions = ['delete_cliente_unused']
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         obj.save()
     def queryset(self, request):
         empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         return super(ClienteAdmin,self).queryset(request).filter(empresa=empresa)
-
+    def get_actions(self, request):
+        actions = super(ClienteAdmin,self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+    def delete_cliente_unused(self,request,queryset):
+        i = 0
+        j = 0
+        for obj in queryset:
+            c = Cotizacion.objects.filter(cliente=obj)
+            if c.count() == 0:
+                obj.delete()
+                j= j+1
+            else:
+                i = i+1
+        if i==1:
+            self.message_user(request,"% s Cliente(s) afectado(s), %s registro no fue borrado por tener movimiento"%(str(j),str(i)))
+        else:
+            self.message_user(request,"%s Cliente(s) afectado(s), %s registros no fue borrados por tener movimiento"%(str(j),str(i)))
+    delete_cliente_unused.short_description = "Eliminar Usuarios sin Movimiento"
 
 class MatriculaAdmin(admin.ModelAdmin):
     list_display = ("nombre_ciudad",)
@@ -198,16 +223,16 @@ class MatriculaAdmin(admin.ModelAdmin):
         return super(MatriculaAdmin, self).queryset(request).filter(empresa=empresas)
 
 class T_financiacionAdmin(admin.ModelAdmin):
+    form = Add_t_financiacion_form
     list_display = ("num_meses",)
-    exclude = ['empresa']
+
     def save_model(self, request, obj, form, change):
         obj.empresa = Empresa.objects.get(pk = request.session.get('user_enterprise'))
         obj.save()
-    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        empresa = Empresa.objects.get(pk = request.session['user_enterprise'])
-        if db_field.name == 'empresa':
-            kwargs['queryset'] = T_financiacion.objects.filter(empresa = empresa)
-        return super(T_financiacionAdmin,self).formfield_for_foreignkey(db_field,request,kwargs)
+    def get_form(self, request, obj=None, **kwargs):
+        AdminForm = super(T_financiacionAdmin,self).get_form(request,obj,**kwargs)
+        AdminForm.request = request
+        return AdminForm
     def queryset(self, request):
         empresas = request.session.get('enterprise')
         return super(T_financiacionAdmin, self).queryset(request).filter(empresa=empresas)
@@ -248,6 +273,18 @@ class MediosAdmin(admin.ModelAdmin):
         empresas = request.session.get('enterprise')
         return super(MediosAdmin, self).queryset(request).filter(empresa=empresas)
 
+class RegistroRequisito(admin.TabularInline):
+    model = registroRequisito
+    extra = 1
+
+class TablaRequisitoAdmin(admin.ModelAdmin):
+    inlines = [RegistroRequisito]
+    exclude = ['empresa']
+    def save_model(self, request, obj, form, change):
+        obj.empresa = request.session.get('enterprise')
+        obj.save()
+
+
 admin.site.register(Usuario, UsuarioAdmin)
 admin.site.register(Empresa,EmpresaAdmin)
 admin.site.register(Cliente,ClienteAdmin)
@@ -258,4 +295,5 @@ admin.site.register(Kit,KitAdmin)
 admin.site.register(Inventario_motos, InventarioMotosAdmin)
 admin.site.register(T_financiacion,T_financiacionAdmin)
 admin.site.register(Matricula,MatriculaAdmin)
+admin.site.register(RequisitoTabla,TablaRequisitoAdmin)
 #admin.site.register(Cotizacion, CotizacionAdmin)

@@ -14,7 +14,7 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: #003366;
+    color: #333;
     text-decoration: none;
 }
 
@@ -27,7 +27,7 @@ a img {
 }
 
 a.section:link, a.section:visited {
-    color: white;
+    color: #FFE373;
     text-decoration: none;
 }
 
@@ -261,7 +261,7 @@ tfoot td {
     color: #666;
     padding: 2px 5px;
     font-size: 11px;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
+    background: #333333;
     border-left: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
@@ -492,8 +492,8 @@ input[type=text], input[type=password], textarea, select, .vTextField {
     font-size: 11px;
     text-align: left;
     font-weight: bold;
-    background: #7CA0C7 url(../img/default-bg.gif) top left repeat-x;
-    color: white;
+    background: #333333;;
+    color: #FFE373;
 }
 
 .module table {

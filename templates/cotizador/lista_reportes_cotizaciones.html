@@ -1,56 +1,48 @@
 {% extends "cotizador/base.html" %}
 {% load extratags %}
-{% block css%}
-    <link href="/static/cotizacion/base.css" rel="stylesheet" type="text/css">
-    <link href="/static/cotizacion/reporte.css" rel="stylesheet" type="text/css">
-    <link href="/static/cotizacion/aside.css" rel="stylesheet" type="text/css">
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/static/cotizacion/aside.css">
+    <link rel="stylesheet" type="text/css" href="/static/cotizacion/historial_cot.css">
+    <link rel="stylesheet" type="text/css" href="/static/cotizacion/jquery.dataTables.css">
 {% endblock %}
 {% block scripts %}
-<script>
-    $(document).ready(function(){
-        $("#topdf").click(function(event){
-            event.preventDefault()
-            window.open("/reportepdf/{{ cot.id }}/","_blank",'width=800,height=600');
-        });
-    });
-</script>
+    <script type ="text/javascript" language="JavaScript" src="/static/cotizacion/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".datatable").dataTable({
+                aaSorting:[[1,"desc"]]
+            });
+
+        })
+    </script>
 {% endblock %}
 
 {% block content-main %}
-<div id="header_reporte">
-    {% if request.session.url_image != null %}
-                <img src="{{ request.session.url_image }} "  width='160px' height='110px'/>
-    {% endif %}
-    <h1><span>Cotizacion Fecha : </span>{{ cot.fecha_cot }}</h1>
-</div>
-<div id ="body_reporte">
-<h1>{{ request.session.enterprise.nombre }}</h1>
-<div id="left_side">
-<h2>Numeracion : {{ cot.numeracion }}</h2>
-<h2>Cliente : {{ cot.cliente.nombre }} {{ cot.cliente.apellidos }}</h2>
-<h2>Vendedor : {{ cot.vendedor.nombre }} {{ cot.vendedor.apellidos }}</h2>
-<h2>Medio : {{ cot.medio.identificador }} {{ cot.medio.medio }}</h2>
-</div>
-<div id="right_side">
-{% autoescape off %}
-  {{ tablas }}
-{% endautoescape %}
-</div>
-</div>
-    <div id="requisitos">
-    <ul id="reqs">
-
-    {% for requisito in requisitos %}
-        <li>{{ requisito }}</li>
-    {% endfor %}
-
-    </ul>
-    </div>
-    <div id="options">
-        <a href="/pdfacorreo/{{ cot.id }}/"><img src="/static/cotizacion/img/mail-forward.png">Enviar Email</a>
-        <a id="topdf" href="#"><img src="/static/cotizacion/img/acroread.png">Ver/Imprimir PDF</a></li>
-        <a id="to_cotizador" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png">Cotizacion</a>
-    </div>
+    <table class="datatable">
+        <thead>
+            <tr>
+                <td>N°</td>
+                <td>Fecha</td>
+                <td>Cliente</td>
+                <td>Vendedor</td>
+                <td> Ver </td>
+                <td>Pdf</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cot in cotizaciones %}
+            <tr>
+            <td>{{ cot.numeracion }}</td>
+            <td>{{ cot.fecha_cot }}</td>
+            <td>{{ cot.cliente.nombre }} {{ cot.cliente.apellidos }}</td>
+            <td>{{ cot.vendedor.nombre }} {{ cot.vendedor.apellidos }}</td>
+            <td><a href="/reporte/{{ cot.id }}/"><img src="/static/cotizacion/img/open.png" width="20px"></a></td>
+            <td><a href="#" onclick="window.open('/reportepdf/{{ cot.id }}/','_blank','width=800,height=600');"><img src="/static/cotizacion/img/acroread.png" /></a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block sidebar %}
@@ -94,6 +86,5 @@
             <li><a id="cot-panel" href="/cotizacion/"><img src="/static/cotizacion/img/wallet.png"/><br>Cotizacion</a></li>
         </ul>
       </div>
-
 
 {% endblock %}

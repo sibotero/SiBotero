@@ -7,8 +7,8 @@ thead td{
 }
 
 thead tr{
-    background-color:#003366;
-    color:white;
+    background: #333 url("/static/admin/img/header_bg.png") repeat-x;
+    color:#f4f379;
 }
 
 
@@ -47,13 +47,39 @@ thead tr{
     display: inline-block;
 }
 
+#left_side{
+    width:20%
+}
+#right_side{
+    width:70%;
+}
+
+
 #left_side, #right_side{
-    width: 45%;
     display: inline-block;
     padding-top: 4px;
     vertical-align: top;
 }
 
+#right_side table{
+    width:100% !important;
+}
+
 #options{
     margin-bottom: 20px;
+}
+
+#reqs{
+    padding:0px;
+    margin:0px;
+}
+
+#reqs li{
+    background: #333 url("/static/admin/img/header_bg.png") repeat-x;
+    border-radius: 10px;
+    color:#f4f379;
+    padding:10px;
+    display:inline-block;
+    list-style: none;
+    text-decoration: none;
 }

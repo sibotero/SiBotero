@@ -46,13 +46,28 @@
     }
 
     .thead{
-        background-color:#003366;
+        background-color:#333;
         border-top-left-radius: 10px;
-        color:white;
+        color: #f4f379 !important;
     }
 
     #right_side table{
         width:100%;
+    }
+
+    #reqs{
+        display:block;
+    }
+
+    .reqs{
+        display:inline-block;
+        width:30%;
+        vertical-align: top;
+    }
+    .reqs thead tr{
+        background: #333;
+        color:white;
+        -webkit-border-radius:15px;
     }
    </style>
 </head>
@@ -115,5 +130,10 @@
 {% endautoescape %}
 </div>
 </div>
-</body>
-</html>
+<div id="reqs">
+{% autoescape off %}
+    {{ requisitos }}
+{% endautoescape %}
+</div>
+</div>
+</body></html>

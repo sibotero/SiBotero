@@ -245,7 +245,7 @@ table {
 
 td, th {
     font-size: 11px;
-    vertical-align: top;
+    vertical-align: middle;
     padding: 5px;
     font-family: "Lucida Grande", Verdana, Arial, sans-serif;
 }
@@ -725,7 +725,7 @@ table#change-history tbody th {
 
 #content-main {
     float: left;
-    width: 60%;
+    width:100%
 }
 
 #content-related {
@@ -742,7 +742,7 @@ table#change-history tbody th {
     height:40px;
     bottom:0px;
     color:#fff;
-    background: #222222 url("/static/admin/img/header_bg.png") repeat-x;
+    background: #333 url("/static/admin/img/header_bg.png") repeat-x;
     background-size: contain;
     margin:auto;
 }

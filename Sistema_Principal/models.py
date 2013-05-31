@@ -44,9 +44,11 @@ class UsuarioManager(BaseUserManager):
         )
         user.is_superuser = True
         user.es_admin = True
-        sicobotero = Empresa.objects.create(nombre="SiBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
-        sicobotero.save()
-        user.empresa.add(sicobotero)
+        sicobotero = Empresa.objects.filter(nombre="SiBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
+        if(sicobotero.count() == 0):
+            sicobotero = Empresa.objects.create(nombre="SiBotero",nit="00000-0",ciudad="Cartagena",cuotas_no_aplic = 0)
+            sicobotero.save()
+        user.empresa.add(sicobotero[0])
         user.ciudad = "Cartagena"
         user.save(using=self._db)
         return user
@@ -99,7 +101,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         return self.esta_activo
 
 class Cliente(models.Model):
-    cedula = models.CharField(max_length=20,help_text=("Cedula del Cliente"),unique=True)
+    cedula = models.CharField(max_length=20,help_text=("Cedula del Cliente"))
     nombre = models.CharField(max_length=20,help_text=("Nombre del Cliente"),null=False)
     apellidos = models.CharField(max_length=40,help_text=("Apellidos del Cliente"),null=False)
     direccion = models.CharField(max_length=200,help_text=("Direccion de Cliente"),null=False)
@@ -113,6 +115,7 @@ class Cliente(models.Model):
     class Meta:
         verbose_name="Cliente"
         verbose_name_plural="Clientes"
+        unique_together=('cedula','empresa')
 
 
 class Matricula(models.Model):
@@ -133,6 +136,7 @@ class Moto(models.Model):
     precio_publico = models.IntegerField(max_length=14,null=False,verbose_name="Precio al Publico")
     cuota_minima = models.IntegerField(max_length=15,null=False,verbose_name="Cuota Minima")
     empresa = models.ForeignKey(Empresa,null=False)
+    imagen_preview = models.ImageField(verbose_name="Foto",upload_to="motos/",default="/static/cotizacion/img/no-moto-img.png")
     def __unicode__(self):
         return self.nombre_fabr+" "+self.referencia+" "+self.modelo
     def __srt__(self):
@@ -150,7 +154,7 @@ class Kit(models.Model):
     casco = models.IntegerField(max_length=10, null=False)
     chaleco = models.IntegerField(max_length=10, null=False)
     transporte = models.IntegerField(max_length=10, null=False)
-    placa = models.IntegerField(max_length=10,null=False)
+    placa = models.IntegerField(max_length=10,null=False,verbose_name="Matricula")
     empresa = models.ForeignKey(Empresa,null=False)
     moto_asociada = models.ForeignKey(Moto,verbose_name="Moto Asociada")
     valor_prenda = models.IntegerField(max_length=10)
@@ -199,6 +203,21 @@ class Medio_Publicitario(models.Model):
         verbose_name= "Medio Publicitario"
         verbose_name_plural= "Medios Publicitarios"
 
+class RequisitoTabla(models.Model):
+    tipousuario = models.CharField(max_length=42,verbose_name="Tipo de Cliente")
+    empresa = models.ForeignKey(Empresa,null=False)
+    def __unicode__(self):
+        return u"%s"%(self.tipousuario)
+    class Meta:
+        verbose_name="Tabla de Requisitos"
+        verbose_name_plural="Tablas de Requisitos"
+
+class registroRequisito(models.Model):
+    tabla = models.ForeignKey(RequisitoTabla,null=False)
+    requisito = models.CharField(max_length=200,null=False)
+    def __unicode__(self):
+        return u"%s"%self.requisito
+
 class Cotizacion(models.Model):
     numeracion = models.IntegerField(max_length=100)
     fecha_cot = models.DateField(auto_now=True,verbose_name="Fecha de cotización")
@@ -207,8 +226,9 @@ class Cotizacion(models.Model):
     no_aplicables = models.BooleanField()
     medio = models.ForeignKey(Medio_Publicitario)
     empresa = models.ForeignKey(Empresa)
+    requisitos = models.ManyToManyField(RequisitoTabla)
     def __unicode__(self):
-        return "%s %s %s"%(self.numeracion,self.fecha_cot,self.cliente)
+        return u'%s %s %s'%(self.numeracion,self.fecha_cot,self.cliente)
     class Meta:
         verbose_name="Cotización"
         verbose_name_plural="Cotizaciones"
@@ -222,4 +242,6 @@ class CotizacionFila(models.Model):
     tipo = models.CharField(max_length=15,null=False)
     n_no_aplicables = models.IntegerField(max_length=2)
     def __unicode__(self):
-        return "%s %s %s "%(self.cotizacion,self.moto,self.tipo)
+        return u'%s %s %s '%(self.cotizacion,self.moto,self.tipo)
+
+
