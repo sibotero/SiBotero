@@ -61,7 +61,7 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return redirect("/login/")
-
+#filtrar los tipos de cotizacion por empresas
 def cotizacion(request):
     if request.user.is_authenticated():
         if request.method == "GET":
@@ -69,9 +69,10 @@ def cotizacion(request):
             form = CotizacionMaestro()
             clientes = Cliente.objects.filter(empresa=empresa).order_by("-id")
             medios = Medio_Publicitario.objects.filter(empresa=empresa)
+            reqs = RequisitoTabla.objects.filter(empresa=empresa)
             form.fields['cliente'].queryset = clientes
             form.fields['medio'].queryset = medios
-
+            form.fields['requisitos'].queryset= reqs
             return render_to_response("cotizador/cotizador.html",{'form':form,'inline':0},context_instance=RequestContext(request))
         if request.method == "POST":
             empresa = request.session['enterprise']
@@ -142,6 +143,13 @@ def cotizacion(request):
                                 reg = T_financiacion.objects.get(empresa=empresa,id=lista[i])
                                 cot.n_cuotas.add(reg)
                             cot.save()
+                            req = request.POST.getlist('requisitos')
+                            cot_maestra.save()
+                            if (len(req)>0):
+                                for r in req:
+                                    a = RequisitoTabla.objects.get(id = r)
+                                    cot_maestra.requisitos.add(a)
+                            cot_maestra.save()
                         else:
                             cuota_inicial = 0
                             moto = Moto.objects.get(id= int(request.POST['moto_'+str(i+1)]))

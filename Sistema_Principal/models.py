@@ -30,7 +30,7 @@ class UsuarioManager(BaseUserManager):
             email=UsuarioManager.normalize_email(email),
         )
         user.set_password(password)
-        user.save(using=self.db)
+        user.save(using=self._db)
         user.save()
         return user
     def create_superuser(self, email, username, password):
@@ -226,7 +226,7 @@ class Cotizacion(models.Model):
     no_aplicables = models.BooleanField()
     medio = models.ForeignKey(Medio_Publicitario)
     empresa = models.ForeignKey(Empresa)
-    requisitos = models.ManyToManyField(RequisitoTabla)
+    requisitos = models.ManyToManyField(RequisitoTabla,blank=True)
     def __unicode__(self):
         return u'%s %s %s'%(self.numeracion,self.fecha_cot,self.cliente)
     class Meta:

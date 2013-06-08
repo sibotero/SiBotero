@@ -283,6 +283,9 @@ class TablaRequisitoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.empresa = request.session.get('enterprise')
         obj.save()
+    def queryset(self, request):
+        empresas = request.session.get('enterprise')
+        return super(TablaRequisitoAdmin,self).queryset(request).filter(empresa=empresas)
 
 
 admin.site.register(Usuario, UsuarioAdmin)
